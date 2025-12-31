@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CAN Bus Real-time Dashboard</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; max-width: 1200px; margin: 20px auto; }
+        .metric { background-color: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+        .metric .label { font-size: 0.9em; color: #666; margin-bottom: 5px; white-space: nowrap; }
+        .metric .value { font-size: 2em; font-weight: bold; color: #333; font-family: monospace; }
+        .fuel-section { grid-column: 1 / -1; } 
+        .fuel-section h3 { text-align: center; color: #555; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;}
+        .fuel-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;}
+        #status-message { text-align: center; margin-top: 1em; height: 1.2em; font-weight: bold; }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-database-compat.js"></script>
+</head>
+<body>
+    <h2 style="text-align: center; color: #FF69B4;">テレメトリーv2</h2>
+    <p id="status-message">Firebaseに接続中...</p>
+
+    <div class="dashboard">
+        <!-- エンジン基本情報 -->
+        <div class="metric"><div class="label">RPM</div><div class="value" id="data-rpm">-</div></div>
+        <div class="metric"><div class="label">TPS (%)</div><div class="value" id="data-tps">-</div></div>
+        <div class="metric"><div class="label">車速 (km/h)</div><div class="value" id="data-kph">-</div></div>
+        <div class="metric"><div class="label">ギア</div><div class="value" id="data-gear">-</div></div>
+        <div class="metric"><div class="label">エンジン水温 (°C)</div><div class="value" id="data-water_temp">-</div></div>
+        <div class="metric"><div class="label">吸気温度 (°C)</div><div class="value" id="data-air_temp">-</div></div>
+        <div class="metric"><div class="label">MAP (kPa)</div><div class="value" id="data-map_kpa">-</div></div>
+        <div class="metric"><div class="label">A/F (Lambda)</div><div class="value" id="data-lambda">-</div></div>
+        <div class="metric"><div class="label">油圧 (kPa)</div><div class="value" id="data-oil_p">-</div></div>
+        <div class="metric"><div class="label">油温 (°C)</div><div class="value" id="data-oil_temp">-</div></div>
+        <div class="metric"><div class="label">燃圧 (kPa)</div><div class="value" id="data-fuel_p">-</div></div>
+        <div class="metric"><div class="label">電圧 (V)</div><div class="value" id="data-volts">-</div></div>
+        <div class="metric"><div class="label">クランクエラー</div><div class="value" id="data-crank_errors">-</div></div>
+        <div class="metric"><div class="label">カムエラー</div><div class="value" id="data-cam_errors">-</div></div>
+
+        <!-- 燃料消費セクション -->
+        <div class="fuel-section">
+            <h3>燃料消費データ</h3>
+            <div class="fuel-metrics">
+                <div class="metric"><div class="label">噴射時間 (ms)</div><div class="value" id="data-injection_ms">-</div></div>
+                <div class="metric"><div class="label">計算 流量 (g/s)</div><div class="value" id="data-calc_fuel_gs">-</div></div>
+                <div class="metric"><div class="label">計算 流量 (L/Hr)</div><div class="value" id="data-calc_fuel_lph">-</div></div>
+                <div class="metric"><div class="label">総消費量 (L)</div><div class="value" id="data-total_fuel_l">-</div></div>
+                <div class="metric"><div class="label">ECU 流量 (L/Hr)</div><div class="value" id="data-fuel_lph">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ★★★ Firebaseプロジェクトの設定情報に書き換えてください ★★★
+    const firebaseConfig = {
+        apiKey: "AIzaSyDf7A3PnHBnx3z6T4sq_44jdq1Ys7CdGnE",
+        authDomain: "ofrac-telemetry.firebaseapp.com",
+        databaseURL: "https://ofrac-telemetry-default-rtdb.firebaseio.com",
+        projectId: "ofrac-telemetry",
+        storageBucket: "ofrac-telemetry.firebasestorage.app",
+        messagingSenderId: "529837424020",
+        appId: "1:529837424020:web:0a7da56e8f154b92132381",
+        measurementId: "G-P12HV5QXYK"
+};
+
+        // Firebaseを初期化
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const statusMessage = document.getElementById('status-message');
+
+        // Realtime Databaseのパスを監視
+        const dataRef = database.ref('livedata/dashboard');
+        dataRef.on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                statusMessage.textContent = '✅ リアルタイムデータ受信中';
+                const data = snapshot.val();
+                
+                // データでダッシュボードを更新
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(`data-${key}`);
+                    if (element) {
+                         // 特定のキーは小数点以下の桁数を調整して見やすくする
+                         if (key === 'total_fuel_l' || key === 'calc_fuel_lph' || key === 'calc_fuel_gs') {
+                            element.textContent = parseFloat(data[key]).toFixed(4);
+                        } else if (key === 'lambda') {
+                            element.textContent = parseFloat(data[key]).toFixed(3);
+                        } else {
+                            element.textContent = data[key];
+                        }
+                    }
+                });
+            } else {
+                statusMessage.textContent = '⌛ データがありません。ESP32がデータを送信しているか確認してください。';
+            }
+        }, (error) => {
+            statusMessage.textContent = `❌ 接続エラー: ${error.message}`;
+            console.error("Firebaseの接続に失敗しました: ", error);
+        });
+    </script>
+</body>
+</html>
+
