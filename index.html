@@ -27,11 +27,28 @@
     0%,100%{background:#fde0e0;border-color:#f44336;box-shadow:0 0 12px #f4433666;}
     50%{background:#ffcdd2;border-color:#d32f2f;box-shadow:0 0 24px #f44336aa;}
   }
+  @keyframes alertPulseWarn {
+    0%,100%{background:#fff3e0;border-color:#ff9800;box-shadow:0 0 8px #ff980044;}
+    50%{background:#ffe0b2;border-color:#f57c00;box-shadow:0 0 16px #ff980088;}
+  }
+  @keyframes alertPulseDanger {
+    0%,100%{background:#ffebee;border-color:#f44336;box-shadow:0 0 10px #f4433655;}
+    50%{background:#ffcdd2;border-color:#d32f2f;box-shadow:0 0 20px #f44336aa;}
+  }
 
   /* ===== HEADER ===== */
   header{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;background:var(--header-bg);border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow);}
   header h1{font-size:18px;font-weight:700;letter-spacing:2px;color:var(--text);}
   header h1 span{color:var(--accent);font-weight:400;font-size:13px;margin-left:8px;}
+  .header-right{display:flex;align-items:center;gap:12px;}
+
+  /* Alert settings button */
+  #alertSettingsBtn{
+    background:var(--card-bg);color:var(--text);border:1px solid var(--border);
+    padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;
+    display:flex;align-items:center;gap:6px;transition:all .2s;font-weight:600;
+  }
+  #alertSettingsBtn:hover{background:#e0e0e0;border-color:#bbb;}
 
   /* --- Connection Status (top-right) --- */
   #connStatus{
@@ -70,6 +87,18 @@
   .data-card .value{font-size:20px;font-weight:700;font-family:'Courier New',monospace;color:var(--accent2);margin-top:2px;}
   .data-card .unit{font-size:10px;color:var(--dim);}
   .data-card.full{grid-column:span 2;}
+
+  /* --- Alert states for data cards --- */
+  .data-card.alert-warn{
+    animation:alertPulseWarn 1s ease-in-out infinite;
+    border-width:2px;
+  }
+  .data-card.alert-warn .value{color:#e65100;font-weight:800;}
+  .data-card.alert-danger{
+    animation:alertPulseDanger 0.7s ease-in-out infinite;
+    border-width:2px;
+  }
+  .data-card.alert-danger .value{color:#d50000;font-weight:800;text-shadow:0 0 6px #f4433644;}
 
   /* --- Error cards (right sidebar, highlighted) --- */
   .data-card.error-card{
@@ -154,6 +183,68 @@
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-track{background:var(--bg);}
   ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}
+
+  /* ===== ALERT SETTINGS MODAL ===== */
+  .modal-overlay{
+    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.4);z-index:1000;
+    justify-content:center;align-items:center;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff;border-radius:12px;padding:0;width:560px;max-height:80vh;
+    box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  .modal-header{
+    padding:16px 24px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    background:#fafafa;flex-shrink:0;
+  }
+  .modal-header h2{font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+  .modal-close{
+    background:none;border:none;font-size:22px;cursor:pointer;color:var(--dim);
+    width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;
+  }
+  .modal-close:hover{background:#eee;color:var(--text);}
+  .modal-body{padding:16px 24px;overflow-y:auto;flex:1;}
+  .modal-footer{
+    padding:12px 24px;border-top:1px solid var(--border);
+    display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;background:#fafafa;
+  }
+  .modal-footer button{
+    padding:8px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;
+    transition:all .2s;
+  }
+  .btn-save{background:var(--accent);color:#fff;border:none;}
+  .btn-save:hover{background:#1b5e20;}
+  .btn-reset{background:#fff;color:var(--dim);border:1px solid var(--border);}
+  .btn-reset:hover{background:#f5f5f5;color:var(--text);}
+
+  /* Alert config table */
+  .alert-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .alert-table th{
+    text-align:left;padding:8px 6px;font-size:11px;text-transform:uppercase;
+    color:var(--dim);letter-spacing:0.5px;border-bottom:2px solid var(--border);font-weight:700;
+  }
+  .alert-table td{padding:6px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+  .alert-table tr:hover{background:#f9f9f9;}
+  .alert-table .param-name{font-weight:600;color:var(--text);white-space:nowrap;}
+  .alert-table .param-unit{color:var(--dim);font-size:11px;margin-left:4px;}
+  .alert-table input[type="number"]{
+    width:80px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;
+    font-size:12px;font-family:'Courier New',monospace;text-align:right;
+    background:#fafafa;transition:border-color .2s;
+  }
+  .alert-table input[type="number"]:focus{outline:none;border-color:var(--accent);background:#fff;}
+  .alert-table input[type="number"]::placeholder{color:#ccc;}
+  .alert-table .enabled-check{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);}
+  .alert-info{
+    font-size:11px;color:var(--dim);margin-bottom:16px;padding:10px 14px;
+    background:#f5f5f5;border-radius:6px;line-height:1.6;
+  }
+  .alert-info strong{color:var(--text);}
 </style>
 </head>
 <body>
@@ -161,8 +252,46 @@
 <!-- HEADER -->
 <header>
   <h1>テレメトリー<span>v2</span></h1>
-  <div id="connStatus"><div id="connDot"></div><span id="connText">ESP未接続…</span></div>
+  <div class="header-right">
+    <button id="alertSettingsBtn" onclick="openAlertModal()">⚙ アラート設定</button>
+    <div id="connStatus"><div id="connDot"></div><span id="connText">ESP未接続…</span></div>
+  </div>
 </header>
+
+<!-- ALERT SETTINGS MODAL -->
+<div class="modal-overlay" id="alertModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>⚙ しきい値アラート設定</h2>
+      <button class="modal-close" onclick="closeAlertModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert-info">
+        <strong>使い方：</strong>各パラメータの下限・上限を設定してください。値がしきい値を超えると、データカードが<span style="color:#ff9800;font-weight:700;">オレンジ</span>（注意）→ <span style="color:#d32f2f;font-weight:700;">赤</span>（危険）に変化します。<br>
+        空欄にすると、そのしきい値は無効になります。有効チェックでアラート全体のON/OFFを切替できます。
+      </div>
+      <table class="alert-table">
+        <thead>
+          <tr>
+            <th>有効</th>
+            <th>パラメータ</th>
+            <th>下限 (注意)</th>
+            <th>下限 (危険)</th>
+            <th>上限 (注意)</th>
+            <th>上限 (危険)</th>
+          </tr>
+        </thead>
+        <tbody id="alertTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-reset" onclick="resetAlertDefaults()">初期値に戻す</button>
+      <button class="btn-save" onclick="saveAlertSettings()">保存して閉じる</button>
+    </div>
+  </div>
+</div>
 
 <!-- MAIN -->
 <div class="main">
@@ -179,19 +308,19 @@
 
     <div class="panel-title">データ数値</div>
     <div class="data-grid">
-      <div class="data-card"><div class="label">TPS</div><div class="value" id="dTps">—</div><div class="unit">%</div></div>
-      <div class="data-card"><div class="label">MAP</div><div class="value" id="dMap">—</div><div class="unit">kPa</div></div>
-      <div class="data-card"><div class="label">Lambda</div><div class="value" id="dLambda">—</div><div class="unit"></div></div>
-      <div class="data-card"><div class="label">水温</div><div class="value" id="dWater">—</div><div class="unit">°C</div></div>
-      <div class="data-card"><div class="label">吸気温</div><div class="value" id="dAir">—</div><div class="unit">°C</div></div>
-      <div class="data-card"><div class="label">油温</div><div class="value" id="dOilT">—</div><div class="unit">°C</div></div>
-      <div class="data-card"><div class="label">油圧</div><div class="value" id="dOilP">—</div><div class="unit">kPa</div></div>
-      <div class="data-card"><div class="label">燃圧</div><div class="value" id="dFuelP">—</div><div class="unit">kPa</div></div>
-      <div class="data-card"><div class="label">電圧</div><div class="value" id="dVolts">—</div><div class="unit">V</div></div>
-      <div class="data-card"><div class="label">噴射時間</div><div class="value" id="dInj">—</div><div class="unit">ms</div></div>
-      <div class="data-card full"><div class="label">総燃料消費</div><div class="value" id="dTotalFuel">—</div><div class="unit">L</div></div>
-      <div class="data-card"><div class="label">燃料 g/s</div><div class="value" id="dFuelGs">—</div><div class="unit">g/s</div></div>
-      <div class="data-card"><div class="label">燃料 L/h</div><div class="value" id="dFuelLph">—</div><div class="unit">L/h</div></div>
+      <div class="data-card" id="card_tps"><div class="label">TPS</div><div class="value" id="dTps">—</div><div class="unit">%</div></div>
+      <div class="data-card" id="card_map"><div class="label">MAP</div><div class="value" id="dMap">—</div><div class="unit">kPa</div></div>
+      <div class="data-card" id="card_lambda"><div class="label">Lambda</div><div class="value" id="dLambda">—</div><div class="unit"></div></div>
+      <div class="data-card" id="card_water"><div class="label">水温</div><div class="value" id="dWater">—</div><div class="unit">°C</div></div>
+      <div class="data-card" id="card_air"><div class="label">吸気温</div><div class="value" id="dAir">—</div><div class="unit">°C</div></div>
+      <div class="data-card" id="card_oilt"><div class="label">油温</div><div class="value" id="dOilT">—</div><div class="unit">°C</div></div>
+      <div class="data-card" id="card_oilp"><div class="label">油圧</div><div class="value" id="dOilP">—</div><div class="unit">kPa</div></div>
+      <div class="data-card" id="card_fuelp"><div class="label">燃圧</div><div class="value" id="dFuelP">—</div><div class="unit">kPa</div></div>
+      <div class="data-card" id="card_volts"><div class="label">電圧</div><div class="value" id="dVolts">—</div><div class="unit">V</div></div>
+      <div class="data-card" id="card_inj"><div class="label">噴射時間</div><div class="value" id="dInj">—</div><div class="unit">ms</div></div>
+      <div class="data-card full" id="card_totalfuel"><div class="label">総燃料消費</div><div class="value" id="dTotalFuel">—</div><div class="unit">L</div></div>
+      <div class="data-card" id="card_fuelgs"><div class="label">燃料 g/s</div><div class="value" id="dFuelGs">—</div><div class="unit">g/s</div></div>
+      <div class="data-card" id="card_fuellph"><div class="label">燃料 L/h</div><div class="value" id="dFuelLph">—</div><div class="unit">L/h</div></div>
     </div>
   </div>
 
@@ -372,6 +501,175 @@ const DATA_KEYS = ['rpm','tps','kph','gear','water_temp','air_temp','map_kpa','l
   'oil_p','oil_temp','fuel_p','volts','crank_errors','cam_errors','injection_ms',
   'calc_fuel_gs','calc_fuel_lph','total_fuel_l','fuel_lph'];
 DATA_KEYS.forEach(k => history[k] = []);
+
+// ========== Alert Threshold System ==========
+// 各パラメータのアラート設定定義
+// cardId: 左サイドバーの対応するカードID
+// dataKey: Firebaseデータのキー
+const ALERT_PARAMS = [
+  { key: 'rpm',         label: 'RPM',       unit: '',    cardId: null,           dataKey: 'rpm',           defaultWarnHi: 13000, defaultDangerHi: 14000, defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'tps',         label: 'TPS',       unit: '%',   cardId: 'card_tps',     dataKey: 'tps',           defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'water_temp',  label: '水温',      unit: '°C',  cardId: 'card_water',   dataKey: 'water_temp',    defaultWarnHi: 95,    defaultDangerHi: 105,   defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'air_temp',    label: '吸気温',    unit: '°C',  cardId: 'card_air',     dataKey: 'air_temp',      defaultWarnHi: 50,    defaultDangerHi: 60,    defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'oil_temp',    label: '油温',      unit: '°C',  cardId: 'card_oilt',    dataKey: 'oil_temp',      defaultWarnHi: 120,   defaultDangerHi: 140,   defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'oil_p',       label: '油圧',      unit: 'kPa', cardId: 'card_oilp',    dataKey: 'oil_p',         defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: 150,  defaultDangerLo: 100 },
+  { key: 'fuel_p',      label: '燃圧',      unit: 'kPa', cardId: 'card_fuelp',   dataKey: 'fuel_p',        defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: 250,  defaultDangerLo: 200 },
+  { key: 'volts',       label: '電圧',      unit: 'V',   cardId: 'card_volts',   dataKey: 'volts',         defaultWarnHi: 15,    defaultDangerHi: 16,    defaultWarnLo: 11.5, defaultDangerLo: 10.5 },
+  { key: 'map_kpa',     label: 'MAP',       unit: 'kPa', cardId: 'card_map',     dataKey: 'map_kpa',       defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'lambda',      label: 'Lambda',    unit: '',    cardId: 'card_lambda',  dataKey: 'lambda',        defaultWarnHi: 1.15,  defaultDangerHi: 1.3,   defaultWarnLo: 0.8,  defaultDangerLo: 0.7 },
+  { key: 'injection_ms',label: '噴射時間',  unit: 'ms',  cardId: 'card_inj',     dataKey: 'injection_ms',  defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'calc_fuel_gs',label: '燃料 g/s',  unit: 'g/s', cardId: 'card_fuelgs',  dataKey: 'calc_fuel_gs',  defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: null, defaultDangerLo: null },
+  { key: 'calc_fuel_lph',label:'燃料 L/h',  unit: 'L/h', cardId: 'card_fuellph', dataKey: 'calc_fuel_lph', defaultWarnHi: null,  defaultDangerHi: null,  defaultWarnLo: null, defaultDangerLo: null },
+];
+
+// 現在のアラート設定（localStorageから読み込み or デフォルト）
+let alertSettings = {};
+
+function getDefaultAlertSettings() {
+  const settings = {};
+  ALERT_PARAMS.forEach(p => {
+    settings[p.key] = {
+      enabled: true,
+      warnHi:   p.defaultWarnHi,
+      dangerHi: p.defaultDangerHi,
+      warnLo:   p.defaultWarnLo,
+      dangerLo: p.defaultDangerLo,
+    };
+  });
+  return settings;
+}
+
+function loadAlertSettings() {
+  try {
+    const saved = localStorage.getItem('telemetry_alert_settings');
+    if (saved) {
+      alertSettings = JSON.parse(saved);
+      // 新しいパラメータが追加された場合のフォールバック
+      ALERT_PARAMS.forEach(p => {
+        if (!alertSettings[p.key]) {
+          alertSettings[p.key] = {
+            enabled: true,
+            warnHi: p.defaultWarnHi, dangerHi: p.defaultDangerHi,
+            warnLo: p.defaultWarnLo, dangerLo: p.defaultDangerLo,
+          };
+        }
+      });
+    } else {
+      alertSettings = getDefaultAlertSettings();
+    }
+  } catch(e) {
+    alertSettings = getDefaultAlertSettings();
+  }
+}
+
+function saveAlertToStorage() {
+  try {
+    localStorage.setItem('telemetry_alert_settings', JSON.stringify(alertSettings));
+  } catch(e) {}
+}
+
+// モーダルにテーブルを描画
+function populateAlertTable() {
+  const tbody = document.getElementById('alertTableBody');
+  tbody.innerHTML = '';
+  ALERT_PARAMS.forEach(p => {
+    const s = alertSettings[p.key] || {};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" class="enabled-check" data-key="${p.key}" ${s.enabled !== false ? 'checked' : ''}></td>
+      <td><span class="param-name">${p.label}</span><span class="param-unit">${p.unit}</span></td>
+      <td><input type="number" step="any" data-key="${p.key}" data-field="warnLo" placeholder="—" value="${s.warnLo != null ? s.warnLo : ''}"></td>
+      <td><input type="number" step="any" data-key="${p.key}" data-field="dangerLo" placeholder="—" value="${s.dangerLo != null ? s.dangerLo : ''}"></td>
+      <td><input type="number" step="any" data-key="${p.key}" data-field="warnHi" placeholder="—" value="${s.warnHi != null ? s.warnHi : ''}"></td>
+      <td><input type="number" step="any" data-key="${p.key}" data-field="dangerHi" placeholder="—" value="${s.dangerHi != null ? s.dangerHi : ''}"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openAlertModal() {
+  populateAlertTable();
+  document.getElementById('alertModal').classList.add('open');
+}
+
+function closeAlertModal() {
+  document.getElementById('alertModal').classList.remove('open');
+}
+
+function saveAlertSettings() {
+  // テーブルから値を読み取り
+  ALERT_PARAMS.forEach(p => {
+    const chk = document.querySelector(`input.enabled-check[data-key="${p.key}"]`);
+    const wLo = document.querySelector(`input[data-key="${p.key}"][data-field="warnLo"]`);
+    const dLo = document.querySelector(`input[data-key="${p.key}"][data-field="dangerLo"]`);
+    const wHi = document.querySelector(`input[data-key="${p.key}"][data-field="warnHi"]`);
+    const dHi = document.querySelector(`input[data-key="${p.key}"][data-field="dangerHi"]`);
+    alertSettings[p.key] = {
+      enabled: chk ? chk.checked : true,
+      warnLo:   wLo && wLo.value !== '' ? parseFloat(wLo.value) : null,
+      dangerLo: dLo && dLo.value !== '' ? parseFloat(dLo.value) : null,
+      warnHi:   wHi && wHi.value !== '' ? parseFloat(wHi.value) : null,
+      dangerHi: dHi && dHi.value !== '' ? parseFloat(dHi.value) : null,
+    };
+  });
+  saveAlertToStorage();
+  closeAlertModal();
+  addLog('⚙ アラート設定を保存しました');
+}
+
+function resetAlertDefaults() {
+  alertSettings = getDefaultAlertSettings();
+  populateAlertTable();
+}
+
+// しきい値チェック＆カード色変更
+function checkAlerts(d) {
+  ALERT_PARAMS.forEach(p => {
+    const s = alertSettings[p.key];
+    if (!s || !s.enabled || !p.cardId) return;
+
+    const card = document.getElementById(p.cardId);
+    if (!card) return;
+
+    const val = parseFloat(d[p.dataKey]);
+    if (isNaN(val)) {
+      card.classList.remove('alert-warn', 'alert-danger');
+      return;
+    }
+
+    let level = 'normal'; // normal, warn, danger
+
+    // 上限チェック（危険 > 注意の順）
+    if (s.dangerHi != null && val >= s.dangerHi) {
+      level = 'danger';
+    } else if (s.warnHi != null && val >= s.warnHi) {
+      level = 'warn';
+    }
+    // 下限チェック（危険 < 注意の順）— 上限が既にdangerなら上書きしない
+    if (level !== 'danger') {
+      if (s.dangerLo != null && val <= s.dangerLo) {
+        level = 'danger';
+      } else if (s.warnLo != null && val <= s.warnLo) {
+        if (level !== 'warn') level = 'warn'; // 上限warnとの重複は warn のまま
+      }
+    }
+
+    card.classList.remove('alert-warn', 'alert-danger');
+    if (level === 'warn') {
+      card.classList.add('alert-warn');
+    } else if (level === 'danger') {
+      card.classList.add('alert-danger');
+    }
+  });
+}
+
+// 初期ロード
+loadAlertSettings();
+
+// モーダル背景クリックで閉じる
+document.getElementById('alertModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAlertModal();
+});
 
 // ========== Chart Setup (3 charts) ==========
 const chartColors = ['#2e7d32', '#00838f', '#e65100'];
@@ -583,6 +881,9 @@ dataRef.on('value', snap => {
 
   // Indicators
   updateIndicators(d);
+
+  // しきい値アラートチェック
+  checkAlerts(d);
 
   // Update all 3 charts
   updateCharts();
