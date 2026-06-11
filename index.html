@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>テレメトリー v2</title>
+  <title>テレメトリー v3</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
@@ -25,6 +25,216 @@
       --card-bg: #f0f0f0;
       --header-bg: #ffffff;
       --shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ===== DARK MODE ===== */
+    [data-theme="dark"] {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --accent: #4caf50;
+      --accent2: #26c6da;
+      --warn: #ef5350;
+      --text: #e6edf3;
+      --dim: #8b949e;
+      --card-bg: #21262d;
+      --header-bg: #0d1117;
+      --shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dark"] .modal {
+      background: #161b22;
+    }
+
+    [data-theme="dark"] .modal-header,
+    [data-theme="dark"] .modal-footer {
+      background: #0d1117;
+      border-color: #30363d;
+    }
+
+    [data-theme="dark"] .modal-close:hover {
+      background: #30363d;
+    }
+
+    [data-theme="dark"] .alert-info {
+      background: #21262d;
+    }
+
+    [data-theme="dark"] .alert-info strong {
+      color: #e6edf3;
+    }
+
+    [data-theme="dark"] .alert-table th {
+      background: #21262d !important;
+      color: #8b949e !important;
+      border-bottom-color: #30363d !important;
+    }
+
+    [data-theme="dark"] .alert-table td {
+      border-bottom-color: #21262d;
+    }
+
+    [data-theme="dark"] .alert-table tr:hover {
+      background: #21262d;
+    }
+
+    [data-theme="dark"] .alert-table .param-name {
+      color: #e6edf3;
+    }
+
+    [data-theme="dark"] .alert-table input[type="number"] {
+      background: #0d1117;
+      color: #e6edf3;
+      border-color: #30363d;
+    }
+
+    [data-theme="dark"] .alert-table input[type="number"]:focus {
+      border-color: var(--accent);
+      background: #161b22;
+    }
+
+    [data-theme="dark"] .alert-table input[type="number"]::placeholder {
+      color: #484f58;
+    }
+
+    [data-theme="dark"] #logArea {
+      color: #8b949e;
+    }
+
+    [data-theme="dark"] #logArea .log-entry {
+      border-bottom-color: #21262d;
+    }
+
+    [data-theme="dark"] #connStatus {
+      background: #2a1515;
+      border-color: #f44336;
+    }
+
+    [data-theme="dark"] #connStatus.connected {
+      background: #122712;
+      border-color: var(--accent);
+    }
+
+    [data-theme="dark"] .data-card.error-card {
+      background: #1f1215;
+      border-color: #f4433644;
+    }
+
+    [data-theme="dark"] .data-card.error-card .label {
+      color: #ef5350;
+    }
+
+    [data-theme="dark"] .data-card.error-card .value {
+      color: #ef5350;
+    }
+
+    [data-theme="dark"] .gauge-svg path[stroke="#ddd"] {
+      stroke: #30363d;
+    }
+
+    [data-theme="dark"] .gauge-svg text {
+      fill: #8b949e;
+    }
+
+    [data-theme="dark"] .btn-reset {
+      background: #21262d;
+      color: #8b949e;
+      border-color: #30363d;
+    }
+
+    [data-theme="dark"] .btn-reset:hover {
+      background: #30363d;
+      color: #e6edf3;
+    }
+
+    [data-theme="dark"] #alertSettingsBtn:hover {
+      background: #30363d;
+      border-color: #484f58;
+    }
+
+    [data-theme="dark"] .ind.on-green {
+      background: #1a3a1a;
+    }
+
+    [data-theme="dark"] .ind.on-red {
+      background: #3a1a1a;
+    }
+
+    [data-theme="dark"] .ind.on-yellow {
+      background: #3a3a0a;
+    }
+
+    [data-theme="dark"] .ind.on-red-pulse {
+      background: #f4433633;
+    }
+
+    /* Dark mode alert animations */
+    @keyframes alertPulseWarnDark {
+
+      0%,
+      100% {
+        background: #2a1f00;
+        border-color: #ff9800;
+        box-shadow: 0 0 8px #ff980044;
+      }
+
+      50% {
+        background: #3a2a00;
+        border-color: #f57c00;
+        box-shadow: 0 0 16px #ff980088;
+      }
+    }
+
+    @keyframes alertPulseDangerDark {
+
+      0%,
+      100% {
+        background: #2a1010;
+        border-color: #f44336;
+        box-shadow: 0 0 10px #f4433655;
+      }
+
+      50% {
+        background: #3a1515;
+        border-color: #d32f2f;
+        box-shadow: 0 0 20px #f44336aa;
+      }
+    }
+
+    @keyframes flashErrorDark {
+
+      0%,
+      100% {
+        background: #2a1010;
+        border-color: #f44336;
+        box-shadow: 0 0 12px #f4433666;
+      }
+
+      50% {
+        background: #3a1515;
+        border-color: #d32f2f;
+        box-shadow: 0 0 24px #f44336aa;
+      }
+    }
+
+    [data-theme="dark"] .data-card.alert-warn {
+      animation: alertPulseWarnDark 1s ease-in-out infinite;
+    }
+
+    [data-theme="dark"] .data-card.alert-danger {
+      animation: alertPulseDangerDark 0.7s ease-in-out infinite;
+    }
+
+    [data-theme="dark"] .data-card.error-card.has-error {
+      animation: flashErrorDark 0.8s ease-in-out infinite;
+    }
+
+    [data-theme="dark"] ::-webkit-scrollbar-track {
+      background: #0d1117;
+    }
+
+    [data-theme="dark"] ::-webkit-scrollbar-thumb {
+      background: #484f58;
     }
 
     body {
@@ -167,6 +377,34 @@
       border-color: #bbb;
     }
 
+    /* Theme & Fullscreen buttons */
+    .header-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .header-btn:hover {
+      background: #e0e0e0;
+      border-color: #bbb;
+    }
+
+    [data-theme="dark"] .header-btn:hover {
+      background: #30363d;
+      border-color: #484f58;
+    }
+
     /* --- Connection Status (top-right) --- */
     #connStatus {
       font-size: 14px;
@@ -228,7 +466,7 @@
       display: flex;
       flex-direction: column;
       overflow-y: auto;
-      padding: 14px;
+      padding: 8px 10px;
       box-shadow: var(--shadow);
     }
 
@@ -268,14 +506,15 @@
     .data-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
+      gap: 4px;
+      margin-bottom: 4px;
     }
 
     .data-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px;
+      border-radius: 4px;
+      padding: 4px;
       text-align: center;
       transition: all .3s;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -289,15 +528,15 @@
     }
 
     .data-card .value {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 700;
       font-family: 'Courier New', monospace;
       color: var(--accent2);
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .data-card .unit {
-      font-size: 10px;
+      font-size: 9px;
       color: var(--dim);
     }
 
@@ -1059,6 +1298,488 @@
         padding: 6px;
       }
     }
+    /* ===== SESSION RECORDING ===== */
+    .rec-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rec-mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 4px;
+      font-size: 11px;
+    }
+
+    .rec-mode-btn {
+      padding: 4px 10px;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      background: transparent;
+      color: var(--dim);
+      transition: all .2s;
+      font-family: inherit;
+    }
+
+    .rec-mode-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    [data-theme="dark"] .rec-mode-btn.active {
+      background: #4caf50;
+    }
+
+    .rec-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--card-bg);
+      color: var(--text);
+      transition: all .2s;
+      font-family: inherit;
+    }
+
+    .rec-btn:hover {
+      background: #e8f5e9;
+      border-color: var(--accent);
+    }
+
+    [data-theme="dark"] .rec-btn:hover {
+      background: #122712;
+    }
+
+    .rec-btn.recording {
+      background: #ffebee;
+      border-color: #f44336;
+      color: #d32f2f;
+    }
+
+    [data-theme="dark"] .rec-btn.recording {
+      background: #2a1010;
+      border-color: #f44336;
+      color: #ef5350;
+    }
+
+    .rec-btn.recording:hover {
+      background: #ffcdd2;
+    }
+
+    [data-theme="dark"] .rec-btn.recording:hover {
+      background: #3a1515;
+    }
+
+    .rec-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f44336;
+      animation: pulseDot 1s ease-in-out infinite;
+    }
+
+    .rec-elapsed {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #d32f2f;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    [data-theme="dark"] .rec-elapsed {
+      color: #ef5350;
+    }
+
+    .rec-auto-label {
+      font-size: 11px;
+      color: var(--dim);
+      font-style: italic;
+    }
+
+    /* History button */
+    .history-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .2s;
+      font-weight: 600;
+      font-family: inherit;
+    }
+
+    .history-btn:hover {
+      background: #e0e0e0;
+      border-color: #bbb;
+    }
+
+    [data-theme="dark"] .history-btn:hover {
+      background: #30363d;
+      border-color: #484f58;
+    }
+
+    /* Session history modal */
+    .session-list {
+      list-style: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .session-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+      gap: 10px;
+    }
+
+    .session-item:hover {
+      background: var(--card-bg);
+    }
+
+    .session-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .session-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .session-meta {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 2px;
+    }
+
+    .session-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .session-action-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all .15s;
+      font-family: inherit;
+    }
+
+    .session-action-btn:hover {
+      background: #e0e0e0;
+    }
+
+    [data-theme="dark"] .session-action-btn:hover {
+      background: #30363d;
+    }
+
+    .session-action-btn.delete:hover {
+      background: #ffebee;
+      color: #d32f2f;
+      border-color: #f44336;
+    }
+
+    [data-theme="dark"] .session-action-btn.delete:hover {
+      background: #2a1010;
+      color: #ef5350;
+      border-color: #f44336;
+    }
+
+    .session-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--dim);
+      font-size: 14px;
+    }
+
+    /* Save session dialog */
+    .save-dialog input[type="text"] {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-bg);
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .save-dialog input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .save-dialog label {
+      font-size: 12px;
+      color: var(--dim);
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .save-dialog .save-stats {
+      font-size: 12px;
+      color: var(--dim);
+      background: var(--card-bg);
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    /* Version info */
+    header h1 span.version-link {
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+
+    header h1 span.version-link:hover {
+      opacity: 0.7;
+      text-decoration: underline;
+    }
+
+    .version-history {
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .version-history h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+
+    .version-history h3:first-child {
+      margin-top: 0;
+    }
+
+    .version-history ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .version-history li {
+      color: var(--text);
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+    /* ===== FUEL PANEL ===== */
+    .fuel-panel {
+      margin-top: 2px;
+      margin-bottom: 4px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--card-bg);
+      flex-shrink: 0;
+    }
+
+    .fuel-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .fuel-panel-header .panel-title {
+      margin: 0;
+      border: none;
+      padding: 0;
+    }
+
+    .fuel-panel-header .fuel-gear-icon {
+      font-size: 11px;
+      color: var(--dim);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background .15s;
+    }
+
+    .fuel-panel-header .fuel-gear-icon:hover {
+      background: var(--border);
+    }
+
+    .fuel-body {
+      padding: 4px;
+    }
+
+    .fuel-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 4px;
+      font-size: 11px;
+    }
+
+    .fuel-row .fuel-label {
+      color: var(--dim);
+      font-size: 11px;
+    }
+
+    .fuel-row .fuel-val {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .fuel-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4px 0;
+    }
+
+    .fuel-settings-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 2px;
+      font-size: 11px;
+    }
+
+    .fuel-settings-row label {
+      color: var(--dim);
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    .fuel-settings-row input {
+      width: 50px;
+      padding: 2px 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      text-align: right;
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .fuel-settings-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .fuel-settings-row .fuel-unit {
+      color: var(--dim);
+      font-size: 10px;
+    }
+
+    /* Endurance progress bar */
+    .endurance-bar-wrap {
+      padding: 4px;
+    }
+
+    .endurance-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--dim);
+      margin-bottom: 3px;
+      font-weight: 600;
+    }
+
+    .endurance-bar {
+      height: 14px;
+      background: var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .endurance-fill {
+      height: 100%;
+      border-radius: 7px;
+      transition: width .5s, background .5s;
+      background: linear-gradient(90deg, var(--accent), #2e7d32);
+      min-width: 0;
+    }
+
+    .endurance-fill.warning {
+      background: linear-gradient(90deg, #f9a825, #ff9800);
+    }
+
+    .endurance-fill.danger {
+      background: linear-gradient(90deg, #ef5350, #d32f2f);
+    }
+
+    .endurance-verdict {
+      text-align: center;
+      padding: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+
+    .endurance-verdict.ok {
+      color: #2e7d32;
+      background: #e8f5e9;
+    }
+
+    .endurance-verdict.warn {
+      color: #e65100;
+      background: #fff3e0;
+    }
+
+    .endurance-verdict.ng {
+      color: #d32f2f;
+      background: #ffebee;
+    }
+
+    [data-theme="dark"] .endurance-verdict.ok {
+      color: #4caf50;
+      background: #122712;
+    }
+
+    [data-theme="dark"] .endurance-verdict.warn {
+      color: #ff9800;
+      background: #2a1f00;
+    }
+
+    [data-theme="dark"] .endurance-verdict.ng {
+      color: #ef5350;
+      background: #2a1010;
+    }
   </style>
 </head>
 
@@ -1066,8 +1787,25 @@
 
   <!-- HEADER -->
   <header>
-    <h1>テレメトリー<span>v2</span></h1>
+    <h1>テレメトリー<span class="version-link" onclick="openVersionModal()" title="バージョン情報・更新履歴">v3</span></h1>
     <div class="header-right">
+      <!-- Recording Controls -->
+      <div class="rec-controls">
+        <div class="rec-mode-toggle">
+          <button class="rec-mode-btn active" id="recModeManual" onclick="setRecMode('manual')" title="手動: ボタンで開始/停止">手動</button>
+          <button class="rec-mode-btn" id="recModeAuto" onclick="setRecMode('auto')" title="自動: エンジン稼働で自動記録">自動</button>
+        </div>
+        <button class="rec-btn" id="recBtn" onclick="toggleRecording()" title="記録開始">🔴 記録</button>
+        <span class="rec-elapsed" id="recElapsed" style="display:none">00:00</span>
+        <span class="rec-auto-label" id="recAutoLabel" style="display:none"></span>
+      </div>
+      <button class="history-btn" onclick="openHistoryModal()">📋 走行履歴</button>
+      <button class="header-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="ダークモード切替 (D)">🌙</button>
+      <button class="header-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="フルスクリーン切替 (F)"><svg width="18"
+          height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+        </svg></button>
       <button id="alertSettingsBtn" onclick="openAlertModal()">⚙ アラート設定</button>
       <div id="connStatus">
         <div id="connDot"></div><span id="connText">ESP未接続…</span>
@@ -1094,10 +1832,14 @@
             <tr>
               <th>有効</th>
               <th>パラメータ</th>
-              <th>下限 (注意)</th>
-              <th>下限 (危険)</th>
-              <th>上限 (注意)</th>
-              <th>上限 (危険)</th>
+              <th style="color:#e65100;background:#fff3e0;border-bottom-color:#ff9800;">▼ 下限 <span
+                  style="color:#ff9800;">⚠注意</span></th>
+              <th style="color:#c62828;background:#ffebee;border-bottom-color:#f44336;">▼ 下限 <span
+                  style="color:#d32f2f;">🔴危険</span></th>
+              <th style="color:#e65100;background:#fff3e0;border-bottom-color:#ff9800;">▲ 上限 <span
+                  style="color:#ff9800;">⚠注意</span></th>
+              <th style="color:#c62828;background:#ffebee;border-bottom-color:#f44336;">▲ 上限 <span
+                  style="color:#d32f2f;">🔴危険</span></th>
             </tr>
           </thead>
           <tbody id="alertTableBody">
@@ -1108,6 +1850,90 @@
       <div class="modal-footer">
         <button class="btn-reset" onclick="resetAlertDefaults()">初期値に戻す</button>
         <button class="btn-save" onclick="saveAlertSettings()">保存して閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION HISTORY MODAL -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal" style="width:640px;">
+      <div class="modal-header">
+        <h2>📋 走行履歴</h2>
+        <button class="modal-close" onclick="closeHistoryModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="sessionListContainer">
+          <div class="session-empty">記録された走行セッションはありません</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-reset" onclick="clearAllSessions()">全履歴を削除</button>
+        <button class="btn-save" onclick="closeHistoryModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION SAVE MODAL -->
+  <div class="modal-overlay" id="saveSessionModal">
+    <div class="modal" style="width:440px;">
+      <div class="modal-header">
+        <h2>💾 セッション保存</h2>
+        <button class="modal-close" onclick="closeSaveModal()">✕</button>
+      </div>
+      <div class="modal-body save-dialog">
+        <div class="save-stats" id="saveStats"></div>
+        <label>セッション名</label>
+        <input type="text" id="sessionNameInput" placeholder="テスト走行 等">
+        <label>メモ（任意）</label>
+        <input type="text" id="sessionMemoInput" placeholder="自由記入">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-reset" onclick="discardRecording()">破棄</button>
+        <button class="btn-save" onclick="confirmSaveSession()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERSION INFO MODAL -->
+  <div class="modal-overlay" id="versionModal">
+    <div class="modal" style="width:480px;">
+      <div class="modal-header">
+        <h2>ℹ️ バージョン情報</h2>
+        <button class="modal-close" onclick="closeVersionModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="version-history">
+          <h3>v3.1 — 2026/06/11</h3>
+          <ul>
+            <li>燃費計算・残量予測・エンデュランス完走判定を追加</li>
+          </ul>
+          <h3>v3.0 — 2026/06/11</h3>
+          <ul>
+            <li>走行セッション記録機能を追加</li>
+            <li>手動モード（ボタン開始/停止）と自動モード（エンジン稼働検知）を選択可能</li>
+            <li>走行履歴の閲覧・振り返り機能</li>
+            <li>セッションデータのCSV/JSONダウンロード機能</li>
+            <li>セッション詳細ビューア（グラフ・統計）</li>
+            <li>バージョン情報・更新履歴の表示</li>
+          </ul>
+          <h3>v2.0</h3>
+          <ul>
+            <li>Firebase RTDBによるリアルタイムテレメトリー表示</li>
+            <li>しきい値アラート設定（Firebase共有）</li>
+            <li>3チャンネルグラフ表示</li>
+            <li>RPMゲージ・車速・ギア表示</li>
+            <li>CRK/CAMエラー表示</li>
+            <li>ダークモード・フルスクリーン対応</li>
+          </ul>
+          <h3>v1.0</h3>
+          <ul>
+            <li>初版リリース</li>
+            <li>基本的なテレメトリーデータの表示</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-save" onclick="closeVersionModal()">閉じる</button>
       </div>
     </div>
   </div>
@@ -1203,6 +2029,54 @@
           <div class="label">燃料 L/h</div>
           <div class="value" id="dFuelLph">—</div>
           <div class="unit">L/h</div>
+        </div>
+      </div>
+
+      <!-- FUEL PANEL -->
+      <div class="fuel-panel">
+        <div class="fuel-panel-header" onclick="document.getElementById('fuelBody').style.display = document.getElementById('fuelBody').style.display === 'none' ? '' : 'none'">
+          <div class="panel-title">⛽ 燃費・残量予測</div>
+          <span class="fuel-gear-icon" title="開閉">▼</span>
+        </div>
+        <div class="fuel-body" id="fuelBody">
+          <div class="fuel-settings-row">
+            <label>タンク容量</label>
+            <input type="number" step="0.1" id="fuelTankCap" value="3.5" onchange="saveFuelSettings()">
+            <span class="fuel-unit">L</span>
+          </div>
+          <div class="fuel-settings-row">
+            <label>エンデュ距離</label>
+            <input type="number" step="0.1" id="fuelEndurDist" value="22" onchange="saveFuelSettings()">
+            <span class="fuel-unit">km</span>
+          </div>
+          <hr class="fuel-divider">
+          <div class="fuel-row">
+            <span class="fuel-label">瞬間燃費</span>
+            <span class="fuel-val" id="fuelInstant">— km/L</span>
+          </div>
+          <div class="fuel-row">
+            <span class="fuel-label">平均燃費</span>
+            <span class="fuel-val" id="fuelAvg">— km/L</span>
+          </div>
+          <div class="fuel-row">
+            <span class="fuel-label">残量推定</span>
+            <span class="fuel-val" id="fuelRemain">— L</span>
+          </div>
+          <div class="fuel-row">
+            <span class="fuel-label">走行可能</span>
+            <span class="fuel-val" id="fuelRange">—</span>
+          </div>
+          <hr class="fuel-divider">
+          <div class="endurance-bar-wrap">
+            <div class="endurance-label">
+              <span>エンデュランス完走判定</span>
+              <span id="endurPercent">—%</span>
+            </div>
+            <div class="endurance-bar">
+              <div class="endurance-fill" id="endurFill" style="width:0%"></div>
+            </div>
+            <div class="endurance-verdict" id="endurVerdict" style="display:none"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1621,6 +2495,93 @@
       document.getElementById('rpmValue').textContent = Math.round(rpm);
     }
 
+    // ========== Fuel Calculations ==========
+    let fuelTankCap = 3.5;
+    let fuelEndurDist = 22.0;
+
+    function saveFuelSettings() {
+      fuelTankCap = parseFloat(document.getElementById('fuelTankCap').value) || 3.5;
+      fuelEndurDist = parseFloat(document.getElementById('fuelEndurDist').value) || 22.0;
+      localStorage.setItem('telemetry-fuelTankCap', fuelTankCap);
+      localStorage.setItem('telemetry-fuelEndurDist', fuelEndurDist);
+      if (latestData) updateFuelPanel(latestData);
+    }
+
+    function loadFuelSettings() {
+      const savedCap = localStorage.getItem('telemetry-fuelTankCap');
+      const savedDist = localStorage.getItem('telemetry-fuelEndurDist');
+      if (savedCap) { fuelTankCap = parseFloat(savedCap); document.getElementById('fuelTankCap').value = fuelTankCap; }
+      if (savedDist) { fuelEndurDist = parseFloat(savedDist); document.getElementById('fuelEndurDist').value = fuelEndurDist; }
+    }
+    loadFuelSettings();
+
+    function updateFuelPanel(d) {
+      const speed = parseFloat(d.kph) || 0;
+      const fuelLph = parseFloat(d.calc_fuel_lph) || 0;
+      const totalFuel = parseFloat(d.total_fuel_l) || 0;
+
+      // 瞬間燃費 (km/L)
+      let instant = 0;
+      if (fuelLph > 0 && speed > 5) {
+        instant = speed / fuelLph;
+      }
+      document.getElementById('fuelInstant').textContent = (speed <= 5 || fuelLph <= 0) ? '--- km/L' : instant.toFixed(2) + ' km/L';
+
+      // 平均燃費 (仮に現在の瞬間燃費のローパスフィルターまたは総走行距離/総燃料で出すべきだが、今回はセッション距離がないため簡易的に計算)
+      // セッション記録中ならデータから平均を出せるが、今回はリアルタイムデータから簡易表示
+      let avg = instant; // TODO: 正確な平均燃費ロジック
+      document.getElementById('fuelAvg').textContent = (speed <= 5 || fuelLph <= 0) ? '--- km/L' : avg.toFixed(2) + ' km/L';
+
+      // 残量推定 (L)
+      let remain = fuelTankCap - totalFuel;
+      if (remain < 0) remain = 0;
+      document.getElementById('fuelRemain').textContent = remain.toFixed(2) + ' L';
+
+      // 走行可能 (km)
+      let range = 0;
+      if (instant > 0) range = remain * instant;
+      document.getElementById('fuelRange').textContent = (range > 0) ? range.toFixed(1) + ' km' : '---';
+
+      // エンデュランス完走判定
+      let percent = 0;
+      if (fuelEndurDist > 0 && instant > 0) {
+        // 完走に必要な燃料
+        const reqFuel = fuelEndurDist / instant;
+        percent = (remain / reqFuel) * 100;
+      } else if (speed <= 5 || fuelLph <= 0) {
+        percent = 100; // 停止中は計算不可として100%表示にしておくか、前回値を保持
+      }
+
+      if (percent > 100) percent = 100;
+      if (percent < 0) percent = 0;
+
+      const fill = document.getElementById('endurFill');
+      fill.style.width = percent + '%';
+      document.getElementById('endurPercent').textContent = percent.toFixed(0) + '%';
+
+      const verdict = document.getElementById('endurVerdict');
+      verdict.style.display = 'block';
+
+      if (speed <= 5 || fuelLph <= 0) {
+        verdict.className = 'endurance-verdict';
+        verdict.textContent = '計算待機中...';
+        verdict.style.display = 'none'; // 停止中は非表示でも良い
+        fill.className = 'endurance-fill';
+      } else if (percent >= 100) {
+        verdict.className = 'endurance-verdict ok';
+        verdict.textContent = '完走可能ペース';
+        fill.className = 'endurance-fill';
+      } else if (percent >= 80) {
+        verdict.className = 'endurance-verdict warn';
+        verdict.textContent = '警告: 燃料ギリギリ';
+        fill.className = 'endurance-fill warning';
+      } else {
+        verdict.className = 'endurance-verdict ng';
+        verdict.textContent = '危険: 完走不可ペース';
+        fill.className = 'endurance-fill danger';
+      }
+    }
+
     // ========== Log ==========
     const logArea = document.getElementById('logArea');
     let logCount = 0;
@@ -1794,6 +2755,13 @@
       // Update all 3 charts
       updateCharts();
 
+      // セッション記録: 最新データを保持 & 自動モード処理
+      latestData = d;
+      handleAutoMode(d);
+
+      // ===== 燃費計算 & パネル更新 =====
+      updateFuelPanel(d);
+
       // Log (throttle to ~2/sec)
       if (now - lastTs >= 500) {
         addLog('RPM:' + (d.rpm || 0) + ' TPS:' + (d.tps || 0) + ' 車速:' + (d.kph || 0) + 'km/h ギア:' + (d.gear || 'N') + ' 水温:' + (d.water_temp || 0) + '°C');
@@ -1812,6 +2780,500 @@
     // Graph select change — any of the 3 selects
     graphSelects.forEach(sel => {
       sel.addEventListener('change', updateCharts);
+    });
+
+    // ========== Dark Mode ==========
+    const FULLSCREEN_ENTER_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+    const FULLSCREEN_EXIT_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>';
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        html.removeAttribute('data-theme');
+        document.getElementById('darkModeBtn').textContent = '🌙';
+        localStorage.setItem('telemetry-theme', 'light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        document.getElementById('darkModeBtn').textContent = '☀️';
+        localStorage.setItem('telemetry-theme', 'dark');
+      }
+      updateChartTheme();
+    }
+
+    function updateChartTheme() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const gridColor = isDark ? '#30363d' : '#eee';
+      const tickColor = isDark ? '#8b949e' : '#999';
+      const legendColor = isDark ? '#8b949e' : '#555';
+      charts.forEach(chart => {
+        chart.options.scales.x.grid.color = gridColor;
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.x.ticks.color = tickColor;
+        chart.options.scales.y.ticks.color = tickColor;
+        chart.options.plugins.legend.labels.color = legendColor;
+        chart.update();
+      });
+    }
+
+    // ページ読み込み時にテーマを復元
+    (function initTheme() {
+      const saved = localStorage.getItem('telemetry-theme');
+      if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('darkModeBtn').textContent = '☀️';
+        setTimeout(updateChartTheme, 100);
+      }
+    })();
+
+    // ========== Fullscreen Mode ==========
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          addLog('⚠ フルスクリーンに切替できませんでした: ' + err.message);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const btn = document.getElementById('fullscreenBtn');
+      if (document.fullscreenElement) {
+        btn.innerHTML = FULLSCREEN_EXIT_SVG;
+        btn.title = 'フルスクリーン解除 (Esc / F)';
+      } else {
+        btn.innerHTML = FULLSCREEN_ENTER_SVG;
+        btn.title = 'フルスクリーン切替 (F)';
+      }
+    });
+
+    // ========== Keyboard Shortcuts ==========
+    document.addEventListener('keydown', (e) => {
+      // 入力フィールドにフォーカスがあるときは無視
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'f':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'd':
+          e.preventDefault();
+          toggleDarkMode();
+          break;
+        case 'r':
+          e.preventDefault();
+          if (recMode === 'manual') toggleRecording();
+          break;
+      }
+    });
+
+    // ========== SESSION RECORDING SYSTEM ==========
+    const SESSION_META_KEY = 'ofrac-telemetry-sessions-meta';
+    const SESSION_DATA_PREFIX = 'ofrac-telemetry-session-';
+    const REC_SAMPLE_INTERVAL = 1000; // 1秒ごとにサンプリング
+    const AUTO_STOP_DELAY = 10000; // 自動モード: RPM=0が10秒続いたら停止
+
+    let recMode = localStorage.getItem('telemetry-recMode') || 'manual'; // 'manual' or 'auto'
+    let isRecording = false;
+    let recStartTime = 0;
+    let recElapsedTimer = null;
+    let recSampleTimer = null;
+    let recDataPoints = [];
+    let latestData = null; // Firebase受信の最新データ
+    let autoStopTimer = null;
+    let autoWasRunning = false;
+
+    // 記録モード初期化
+    (function initRecMode() {
+      if (recMode === 'auto') {
+        document.getElementById('recModeManual').classList.remove('active');
+        document.getElementById('recModeAuto').classList.add('active');
+        document.getElementById('recBtn').style.display = 'none';
+        document.getElementById('recAutoLabel').style.display = '';
+        document.getElementById('recAutoLabel').textContent = '待機中…';
+      }
+    })();
+
+    function setRecMode(mode) {
+      recMode = mode;
+      localStorage.setItem('telemetry-recMode', mode);
+      document.getElementById('recModeManual').classList.toggle('active', mode === 'manual');
+      document.getElementById('recModeAuto').classList.toggle('active', mode === 'auto');
+
+      if (mode === 'manual') {
+        document.getElementById('recBtn').style.display = '';
+        document.getElementById('recAutoLabel').style.display = 'none';
+        if (isRecording) {
+          // 自動から手動に切替中に記録中なら、そのまま続行（ボタン表示に切替）
+          document.getElementById('recBtn').classList.add('recording');
+          document.getElementById('recBtn').innerHTML = '<span class="rec-dot"></span> 停止';
+        }
+        // 自動停止タイマーをクリア
+        if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
+      } else {
+        // 自動モード
+        if (!isRecording) {
+          document.getElementById('recBtn').style.display = 'none';
+          document.getElementById('recAutoLabel').style.display = '';
+          document.getElementById('recAutoLabel').textContent = '待機中…';
+        } else {
+          document.getElementById('recBtn').style.display = 'none';
+          document.getElementById('recAutoLabel').style.display = '';
+          document.getElementById('recAutoLabel').textContent = '記録中…';
+        }
+      }
+      addLog('⚙ 記録モード: ' + (mode === 'manual' ? '手動' : '自動'));
+    }
+
+    function toggleRecording() {
+      if (recMode !== 'manual') return;
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+
+    function startRecording() {
+      if (isRecording) return;
+      isRecording = true;
+      recStartTime = Date.now();
+      recDataPoints = [];
+
+      // UI更新
+      const btn = document.getElementById('recBtn');
+      btn.classList.add('recording');
+      btn.innerHTML = '<span class="rec-dot"></span> 停止';
+      btn.title = '記録停止';
+      document.getElementById('recElapsed').style.display = '';
+      document.getElementById('recElapsed').textContent = '00:00';
+
+      if (recMode === 'auto') {
+        document.getElementById('recAutoLabel').textContent = '記録中…';
+      }
+
+      // 経過時間更新
+      recElapsedTimer = setInterval(() => {
+        const elapsed = Date.now() - recStartTime;
+        const min = Math.floor(elapsed / 60000);
+        const sec = Math.floor((elapsed % 60000) / 1000);
+        document.getElementById('recElapsed').textContent =
+          String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+      }, 500);
+
+      // データサンプリング（1秒間隔）
+      recSampleTimer = setInterval(() => {
+        if (latestData) {
+          const point = { ts: Date.now() };
+          DATA_KEYS.forEach(k => {
+            if (latestData[k] !== undefined) point[k] = parseFloat(latestData[k]) || 0;
+          });
+          if (latestData.gear !== undefined) point.gear = latestData.gear;
+          recDataPoints.push(point);
+        }
+      }, REC_SAMPLE_INTERVAL);
+
+      addLog('🔴 セッション記録を開始しました');
+    }
+
+    function stopRecording() {
+      if (!isRecording) return;
+      isRecording = false;
+      const endTime = Date.now();
+
+      // タイマー停止
+      if (recElapsedTimer) { clearInterval(recElapsedTimer); recElapsedTimer = null; }
+      if (recSampleTimer) { clearInterval(recSampleTimer); recSampleTimer = null; }
+      if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
+
+      // UI復帰
+      const btn = document.getElementById('recBtn');
+      btn.classList.remove('recording');
+      btn.innerHTML = '🔴 記録';
+      btn.title = '記録開始';
+      document.getElementById('recElapsed').style.display = 'none';
+
+      if (recMode === 'auto') {
+        document.getElementById('recAutoLabel').textContent = '待機中…';
+      }
+
+      addLog('⏹ セッション記録を停止しました（' + recDataPoints.length + 'ポイント）');
+
+      // データがあれば保存ダイアログを表示
+      if (recDataPoints.length > 0) {
+        showSaveDialog(endTime);
+      }
+    }
+
+    function showSaveDialog(endTime) {
+      const duration = endTime - recStartTime;
+      const min = Math.floor(duration / 60000);
+      const sec = Math.floor((duration % 60000) / 1000);
+      const dateStr = new Date(recStartTime).toLocaleString('ja-JP', { hour12: false });
+
+      document.getElementById('saveStats').innerHTML =
+        '📊 記録データ: <strong>' + recDataPoints.length + '</strong>ポイント' +
+        ' ｜ 記録時間: <strong>' + min + '分' + sec + '秒</strong>' +
+        ' ｜ 開始: ' + dateStr;
+
+      // デフォルト名を設定
+      const now = new Date(recStartTime);
+      const defaultName = now.getFullYear() + '/' +
+        String(now.getMonth() + 1).padStart(2, '0') + '/' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('sessionNameInput').value = defaultName;
+      document.getElementById('sessionMemoInput').value = '';
+
+      document.getElementById('saveSessionModal').classList.add('open');
+    }
+
+    function closeSaveModal() {
+      document.getElementById('saveSessionModal').classList.remove('open');
+    }
+
+    function confirmSaveSession() {
+      const name = document.getElementById('sessionNameInput').value.trim() || '無名セッション';
+      const memo = document.getElementById('sessionMemoInput').value.trim();
+      const endTime = recDataPoints.length > 0 ? recDataPoints[recDataPoints.length - 1].ts : Date.now();
+
+      const sessionId = 'session_' + recStartTime;
+      const meta = {
+        id: sessionId,
+        name: name,
+        memo: memo,
+        startTime: recStartTime,
+        endTime: endTime,
+        duration: endTime - recStartTime,
+        pointCount: recDataPoints.length,
+        mode: recMode
+      };
+
+      // メタデータ保存
+      const allMeta = getSessionsMeta();
+      allMeta.unshift(meta); // 新しい順に先頭に追加
+      try {
+        localStorage.setItem(SESSION_META_KEY, JSON.stringify(allMeta));
+        localStorage.setItem(SESSION_DATA_PREFIX + sessionId, JSON.stringify(recDataPoints));
+        addLog('💾 セッション「' + name + '」を保存しました');
+      } catch (e) {
+        if (e.name === 'QuotaExceededError') {
+          alert('⚠ ストレージ容量不足です。走行履歴から古いセッションを削除してください。');
+          addLog('⚠ 保存失敗: ストレージ容量不足');
+        } else {
+          alert('保存に失敗しました: ' + e.message);
+        }
+        return;
+      }
+
+      recDataPoints = [];
+      closeSaveModal();
+    }
+
+    function discardRecording() {
+      if (!confirm('記録データを破棄しますか？')) return;
+      recDataPoints = [];
+      closeSaveModal();
+      addLog('🗑 記録データを破棄しました');
+    }
+
+    // ========== 自動モード: エンジン稼働検知 ==========
+    function handleAutoMode(d) {
+      if (recMode !== 'auto') return;
+      const rpm = parseFloat(d.rpm) || 0;
+      const engineRunning = rpm > 0;
+
+      if (engineRunning && !isRecording) {
+        // エンジン始動 → 記録開始
+        if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
+        startRecording();
+        addLog('🔄 自動モード: エンジン稼働を検知 → 記録開始');
+      } else if (!engineRunning && isRecording) {
+        // エンジン停止 → 遅延付きで停止
+        if (!autoStopTimer) {
+          autoStopTimer = setTimeout(() => {
+            if (isRecording && recMode === 'auto') {
+              addLog('🔄 自動モード: エンジン停止を検知 → 記録停止');
+              stopRecording();
+            }
+            autoStopTimer = null;
+          }, AUTO_STOP_DELAY);
+        }
+      } else if (engineRunning && isRecording && autoStopTimer) {
+        // 一時的にRPM=0だったが復帰 → 停止タイマーキャンセル
+        clearTimeout(autoStopTimer);
+        autoStopTimer = null;
+      }
+    }
+
+    // ========== セッションメタデータ管理 ==========
+    function getSessionsMeta() {
+      try {
+        const raw = localStorage.getItem(SESSION_META_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    }
+
+    // ========== 走行履歴モーダル ==========
+    function openHistoryModal() {
+      renderSessionList();
+      document.getElementById('historyModal').classList.add('open');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.remove('open');
+    }
+
+    function renderSessionList() {
+      const meta = getSessionsMeta();
+      const container = document.getElementById('sessionListContainer');
+
+      if (meta.length === 0) {
+        container.innerHTML = '<div class="session-empty">記録された走行セッションはありません</div>';
+        return;
+      }
+
+      let html = '<ul class="session-list">';
+      meta.forEach((s, i) => {
+        const date = new Date(s.startTime).toLocaleString('ja-JP', { hour12: false });
+        const dur = Math.floor(s.duration / 60000) + '分' + Math.floor((s.duration % 60000) / 1000) + '秒';
+        const modeLabel = s.mode === 'auto' ? '自動' : '手動';
+        html += `
+          <li class="session-item">
+            <div class="session-info">
+              <div class="session-name">${escapeHtml(s.name)}</div>
+              <div class="session-meta">${date} ｜ ${dur} ｜ ${s.pointCount}pt ｜ ${modeLabel}${s.memo ? ' ｜ ' + escapeHtml(s.memo) : ''}</div>
+            </div>
+            <div class="session-actions">
+              <button class="session-action-btn" onclick="viewSession('${s.id}')" title="詳細を見る">📊 閲覧</button>
+              <button class="session-action-btn" onclick="downloadSessionCSV('${s.id}')" title="CSVダウンロード">📄 CSV</button>
+              <button class="session-action-btn" onclick="downloadSessionJSON('${s.id}')" title="JSONダウンロード">📋 JSON</button>
+              <button class="session-action-btn delete" onclick="deleteSession('${s.id}', ${i})" title="削除">🗑</button>
+            </div>
+          </li>`;
+      });
+      html += '</ul>';
+      container.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function deleteSession(id, index) {
+      if (!confirm('このセッションを削除しますか？')) return;
+      const meta = getSessionsMeta();
+      meta.splice(index, 1);
+      localStorage.setItem(SESSION_META_KEY, JSON.stringify(meta));
+      localStorage.removeItem(SESSION_DATA_PREFIX + id);
+      renderSessionList();
+      addLog('🗑 セッションを削除しました');
+    }
+
+    function clearAllSessions() {
+      if (!confirm('全ての走行履歴を削除しますか？\nこの操作は取り消せません。')) return;
+      const meta = getSessionsMeta();
+      meta.forEach(s => localStorage.removeItem(SESSION_DATA_PREFIX + s.id));
+      localStorage.removeItem(SESSION_META_KEY);
+      renderSessionList();
+      addLog('🗑 全走行履歴を削除しました');
+    }
+
+    // ========== セッション閲覧（別ページに遷移） ==========
+    function viewSession(id) {
+      closeHistoryModal();
+      window.open('session_viewer.html?id=' + encodeURIComponent(id), '_blank');
+    }
+
+    // ========== ダウンロード機能 ==========
+    function getSessionData(id) {
+      try {
+        const raw = localStorage.getItem(SESSION_DATA_PREFIX + id);
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    }
+
+    function getSessionMeta(id) {
+      const meta = getSessionsMeta();
+      return meta.find(s => s.id === id) || null;
+    }
+
+    function downloadSessionCSV(id) {
+      const data = getSessionData(id);
+      const meta = getSessionMeta(id);
+      if (!data || data.length === 0) { alert('データがありません'); return; }
+
+      const headers = ['Timestamp', 'Time', 'RPM', 'TPS(%)', 'Speed(km/h)', 'Gear',
+        'WaterTemp(°C)', 'AirTemp(°C)', 'MAP(kPa)', 'Lambda', 'OilP(kPa)', 'OilTemp(°C)',
+        'FuelP(kPa)', 'Volts(V)', 'Injection(ms)', 'FuelGs(g/s)', 'FuelLph(L/h)',
+        'TotalFuel(L)', 'CRK_Errors', 'CAM_Errors'];
+
+      const dataKeys = ['rpm', 'tps', 'kph', 'gear', 'water_temp', 'air_temp', 'map_kpa', 'lambda',
+        'oil_p', 'oil_temp', 'fuel_p', 'volts', 'injection_ms', 'calc_fuel_gs', 'calc_fuel_lph',
+        'total_fuel_l', 'crank_errors', 'cam_errors'];
+
+      const rows = data.map(p => {
+        const time = new Date(p.ts).toLocaleTimeString('ja-JP', { hour12: false }) + '.' +
+          String(new Date(p.ts).getMilliseconds()).padStart(3, '0');
+        return [p.ts, time, ...dataKeys.map(k => p[k] !== undefined ? p[k] : '')];
+      });
+
+      const csv = '\uFEFF' + [
+        headers.map(h => '"' + h + '"').join(','),
+        ...rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
+      ].join('\n');
+
+      const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.csv';
+      downloadBlob(csv, filename, 'text/csv;charset=utf-8;');
+      addLog('📄 CSVダウンロード: ' + filename);
+    }
+
+    function downloadSessionJSON(id) {
+      const data = getSessionData(id);
+      const meta = getSessionMeta(id);
+      if (!data || data.length === 0) { alert('データがありません'); return; }
+
+      const exportObj = {
+        exportDate: new Date().toISOString(),
+        session: meta,
+        dataPoints: data
+      };
+
+      const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.json';
+      downloadBlob(JSON.stringify(exportObj, null, 2), filename, 'application/json');
+      addLog('📋 JSONダウンロード: ' + filename);
+    }
+
+    function downloadBlob(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ========== バージョンモーダル ==========
+    function openVersionModal() {
+      document.getElementById('versionModal').classList.add('open');
+    }
+
+    function closeVersionModal() {
+      document.getElementById('versionModal').classList.remove('open');
+    }
+
+    // ========== 新モーダルの背景クリック閉じ ==========
+    ['historyModal', 'saveSessionModal', 'versionModal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('open');
+      });
     });
   </script>
 </body>
