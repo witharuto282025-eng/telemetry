@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>テレメトリー v3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
@@ -238,13 +241,15 @@
     }
 
     body {
-      font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
+      font-family: 'Noto Sans JP', 'Segoe UI', 'Hiragino Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       height: 100vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     /* ===== ANIMATIONS ===== */
@@ -1646,13 +1651,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 2px 4px;
-      font-size: 11px;
+      padding: 3px 6px;
+      font-size: 12px;
     }
 
     .fuel-row .fuel-label {
       color: var(--dim);
-      font-size: 11px;
+      font-size: 12px;
     }
 
     .fuel-row .fuel-val {
@@ -1671,14 +1676,14 @@
     .fuel-settings-row {
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 2px;
-      font-size: 11px;
+      gap: 6px;
+      padding: 3px 4px;
+      font-size: 12px;
     }
 
     .fuel-settings-row label {
       color: var(--dim);
-      font-size: 10px;
+      font-size: 11px;
       flex-shrink: 0;
     }
 
@@ -1712,7 +1717,7 @@
     .endurance-label {
       display: flex;
       justify-content: space-between;
-      font-size: 10px;
+      font-size: 11px;
       color: var(--dim);
       margin-bottom: 3px;
       font-weight: 600;
@@ -1744,8 +1749,8 @@
 
     .endurance-verdict {
       text-align: center;
-      padding: 4px;
-      font-size: 11px;
+      padding: 5px;
+      font-size: 12px;
       font-weight: 700;
       border-radius: 4px;
       margin-top: 4px;
@@ -1780,6 +1785,181 @@
       color: #ef5350;
       background: #2a1010;
     }
+
+    /* Fuel refuel input row */
+    .fuel-refuel-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 4px 2px 4px;
+    }
+
+    .fuel-refuel-row label {
+      color: var(--dim);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .fuel-refuel-row input {
+      width: 50px;
+      padding: 2px 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      text-align: right;
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .fuel-refuel-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .fuel-refuel-row .fuel-unit {
+      color: var(--dim);
+      font-size: 10px;
+    }
+
+    .fuel-refuel-btn {
+      padding: 2px 8px;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+
+    .fuel-refuel-btn:hover {
+      background: #1b5e20;
+    }
+
+    [data-theme="dark"] .fuel-refuel-btn:hover {
+      background: #388e3c;
+    }
+
+    /* Fuel panel action buttons */
+    .fuel-actions {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+    }
+
+    .fuel-reset-btn {
+      flex: 1;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--dim);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+      text-align: center;
+    }
+
+    .fuel-reset-btn:hover {
+      background: #ffebee;
+      color: #d32f2f;
+      border-color: #f44336;
+    }
+
+    [data-theme="dark"] .fuel-reset-btn:hover {
+      background: #2a1010;
+      color: #ef5350;
+      border-color: #f44336;
+    }
+
+    /* Tank capacity display in fuel panel */
+    .fuel-tank-display {
+      font-size: 11px;
+      color: var(--dim);
+      padding: 3px 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fuel-tank-display .tank-val {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .fuel-tank-display .tank-edit-hint {
+      font-size: 9px;
+      color: var(--dim);
+      cursor: pointer;
+      text-decoration: underline;
+      transition: color .2s;
+    }
+
+    .fuel-tank-display .tank-edit-hint:hover {
+      color: var(--accent);
+    }
+
+    /* Settings section in alert modal */
+    .settings-section {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .settings-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 13px;
+    }
+
+    .settings-row label {
+      color: var(--text);
+      font-weight: 600;
+      min-width: 100px;
+    }
+
+    .settings-row input[type="number"] {
+      width: 80px;
+      padding: 4px 6px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      text-align: right;
+      background: var(--panel);
+      color: var(--text);
+      transition: border-color .2s;
+    }
+
+    .settings-row input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .settings-row .settings-unit {
+      color: var(--dim);
+      font-size: 12px;
+    }
   </style>
 </head>
 
@@ -1795,18 +1975,18 @@
           <button class="rec-mode-btn active" id="recModeManual" onclick="setRecMode('manual')" title="手動: ボタンで開始/停止">手動</button>
           <button class="rec-mode-btn" id="recModeAuto" onclick="setRecMode('auto')" title="自動: エンジン稼働で自動記録">自動</button>
         </div>
-        <button class="rec-btn" id="recBtn" onclick="toggleRecording()" title="記録開始">🔴 記録</button>
+        <button class="rec-btn" id="recBtn" onclick="toggleRecording()" title="記録開始">REC 記録</button>
         <span class="rec-elapsed" id="recElapsed" style="display:none">00:00</span>
         <span class="rec-auto-label" id="recAutoLabel" style="display:none"></span>
       </div>
-      <button class="history-btn" onclick="openHistoryModal()">📋 走行履歴</button>
+      <button class="history-btn" onclick="openHistoryModal()">走行履歴</button>
       <button class="header-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="ダークモード切替 (D)">🌙</button>
       <button class="header-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="フルスクリーン切替 (F)"><svg width="18"
           height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
         </svg></button>
-      <button id="alertSettingsBtn" onclick="openAlertModal()">⚙ アラート設定</button>
+      <button id="alertSettingsBtn" onclick="openAlertModal()">⚙ 設定</button>
       <div id="connStatus">
         <div id="connDot"></div><span id="connText">ESP未接続…</span>
       </div>
@@ -1817,12 +1997,27 @@
   <div class="modal-overlay" id="alertModal">
     <div class="modal">
       <div class="modal-header">
-        <h2>⚙ しきい値アラート設定</h2>
+        <h2>設定</h2>
         <button class="modal-close" onclick="closeAlertModal()">✕</button>
       </div>
       <div class="modal-body">
+        <!-- 燃費設定セクション -->
+        <div class="settings-section">
+          <div class="settings-section-title">燃費設定</div>
+          <div class="settings-row">
+            <label>タンク容量</label>
+            <input type="number" step="0.1" id="settingsTankCap" value="3.5">
+            <span class="settings-unit">L</span>
+          </div>
+          <div class="settings-row">
+            <label>エンデュ距離</label>
+            <input type="number" step="0.1" id="settingsEndurDist" value="22">
+            <span class="settings-unit">km</span>
+          </div>
+        </div>
+        <!-- アラート設定セクション -->
         <div class="alert-info">
-          <strong>使い方：</strong>各パラメータの下限・上限を設定してください。値がしきい値を超えると、データカードが<span
+          <strong>アラート設定：</strong>各パラメータの下限・上限を設定してください。値がしきい値を超えると、データカードが<span
             style="color:#ff9800;font-weight:700;">オレンジ</span>（注意）→ <span
             style="color:#d32f2f;font-weight:700;">赤</span>（危険）に変化します。<br>
           空欄にすると、そのしきい値は無効になります。有効チェックでアラート全体のON/OFFを切替できます。
@@ -1858,7 +2053,7 @@
   <div class="modal-overlay" id="historyModal">
     <div class="modal" style="width:640px;">
       <div class="modal-header">
-        <h2>📋 走行履歴</h2>
+        <h2>走行履歴</h2>
         <button class="modal-close" onclick="closeHistoryModal()">✕</button>
       </div>
       <div class="modal-body">
@@ -1877,7 +2072,7 @@
   <div class="modal-overlay" id="saveSessionModal">
     <div class="modal" style="width:440px;">
       <div class="modal-header">
-        <h2>💾 セッション保存</h2>
+        <h2>セッション保存</h2>
         <button class="modal-close" onclick="closeSaveModal()">✕</button>
       </div>
       <div class="modal-body save-dialog">
@@ -1898,7 +2093,7 @@
   <div class="modal-overlay" id="versionModal">
     <div class="modal" style="width:480px;">
       <div class="modal-header">
-        <h2>ℹ️ バージョン情報</h2>
+        <h2>バージョン情報</h2>
         <button class="modal-close" onclick="closeVersionModal()">✕</button>
       </div>
       <div class="modal-body">
@@ -2035,19 +2230,26 @@
       <!-- FUEL PANEL -->
       <div class="fuel-panel">
         <div class="fuel-panel-header" onclick="document.getElementById('fuelBody').style.display = document.getElementById('fuelBody').style.display === 'none' ? '' : 'none'">
-          <div class="panel-title">⛽ 燃費・残量予測</div>
+          <div class="panel-title">燃費・残量予測</div>
           <span class="fuel-gear-icon" title="開閉">▼</span>
         </div>
         <div class="fuel-body" id="fuelBody">
-          <div class="fuel-settings-row">
-            <label>タンク容量</label>
-            <input type="number" step="0.1" id="fuelTankCap" value="3.5" onchange="saveFuelSettings()">
-            <span class="fuel-unit">L</span>
+          <div class="fuel-tank-display">
+            タンク容量: <span class="tank-val" id="fuelTankCapDisplay">3.5</span> L
+            <span class="tank-edit-hint" onclick="openAlertModal()" title="設定で変更">変更</span>
           </div>
           <div class="fuel-settings-row">
             <label>エンデュ距離</label>
             <input type="number" step="0.1" id="fuelEndurDist" value="22" onchange="saveFuelSettings()">
             <span class="fuel-unit">km</span>
+          </div>
+          <hr class="fuel-divider">
+          <!-- ガソリン投入量 -->
+          <div class="fuel-refuel-row">
+            <label>給油量</label>
+            <input type="number" step="0.1" id="fuelRefuelInput" value="" placeholder="0.0">
+            <span class="fuel-unit">L</span>
+            <button class="fuel-refuel-btn" onclick="addRefuel()" title="給油量を反映">投入</button>
           </div>
           <hr class="fuel-divider">
           <div class="fuel-row">
@@ -2066,6 +2268,10 @@
             <span class="fuel-label">走行可能</span>
             <span class="fuel-val" id="fuelRange">—</span>
           </div>
+          <div class="fuel-row">
+            <span class="fuel-label">給油済み合計</span>
+            <span class="fuel-val" id="fuelRefueled">0.00 L</span>
+          </div>
           <hr class="fuel-divider">
           <div class="endurance-bar-wrap">
             <div class="endurance-label">
@@ -2076,6 +2282,10 @@
               <div class="endurance-fill" id="endurFill" style="width:0%"></div>
             </div>
             <div class="endurance-verdict" id="endurVerdict" style="display:none"></div>
+          </div>
+          <!-- リセットボタン -->
+          <div class="fuel-actions">
+            <button class="fuel-reset-btn" onclick="resetFuelData()" title="燃費データをリセット">リセット</button>
           </div>
         </div>
       </div>
@@ -2334,7 +2544,7 @@
               alertSettings[p.key] = saved[p.key];
             }
           });
-          addLog('⚙ アラート設定をサーバーから同期しました');
+          addLog('[SYNC] アラート設定をサーバーから同期');
         }
       });
     }
@@ -2344,7 +2554,7 @@
       try {
         alertSettingsRef.set(alertSettings);
       } catch (e) {
-        addLog('⚠ アラート設定の保存に失敗しました: ' + e.message);
+        addLog('[ERR] アラート設定の保存に失敗: ' + e.message);
       }
     }
 
@@ -2369,6 +2579,9 @@
 
     function openAlertModal() {
       populateAlertTable();
+      // 設定モーダルに現在の燃費設定を反映
+      document.getElementById('settingsTankCap').value = fuelTankCap;
+      document.getElementById('settingsEndurDist').value = fuelEndurDist;
       document.getElementById('alertModal').classList.add('open');
     }
 
@@ -2377,6 +2590,8 @@
     }
 
     function saveAlertSettings() {
+      // 燃費設定を保存
+      saveFuelSettingsFromModal();
       // テーブルから値を読み取り
       ALERT_PARAMS.forEach(p => {
         const chk = document.querySelector(`input.enabled-check[data-key="${p.key}"]`);
@@ -2394,7 +2609,7 @@
       });
       saveAlertToStorage();
       closeAlertModal();
-      addLog('⚙ アラート設定を保存しました');
+      addLog('[SAVE] 設定を保存しました');
     }
 
     function resetAlertDefaults() {
@@ -2498,27 +2713,87 @@
     // ========== Fuel Calculations ==========
     let fuelTankCap = 3.5;
     let fuelEndurDist = 22.0;
+    let fuelRefueledTotal = 0; // 給油済み合計 (L)
+    let fuelBaseOffset = 0; // リセット時のtotal_fuel_lオフセット
 
     function saveFuelSettings() {
-      fuelTankCap = parseFloat(document.getElementById('fuelTankCap').value) || 3.5;
       fuelEndurDist = parseFloat(document.getElementById('fuelEndurDist').value) || 22.0;
       localStorage.setItem('telemetry-fuelTankCap', fuelTankCap);
       localStorage.setItem('telemetry-fuelEndurDist', fuelEndurDist);
+      localStorage.setItem('telemetry-fuelRefueled', fuelRefueledTotal);
+      localStorage.setItem('telemetry-fuelBaseOffset', fuelBaseOffset);
+      updateFuelTankDisplay();
       if (latestData) updateFuelPanel(latestData);
+    }
+
+    function saveFuelSettingsFromModal() {
+      fuelTankCap = parseFloat(document.getElementById('settingsTankCap').value) || 3.5;
+      fuelEndurDist = parseFloat(document.getElementById('settingsEndurDist').value) || 22.0;
+      localStorage.setItem('telemetry-fuelTankCap', fuelTankCap);
+      localStorage.setItem('telemetry-fuelEndurDist', fuelEndurDist);
+      // 燃費パネルのUI同期
+      document.getElementById('fuelEndurDist').value = fuelEndurDist;
+      updateFuelTankDisplay();
+      if (latestData) updateFuelPanel(latestData);
+    }
+
+    function updateFuelTankDisplay() {
+      document.getElementById('fuelTankCapDisplay').textContent = fuelTankCap.toFixed(1);
     }
 
     function loadFuelSettings() {
       const savedCap = localStorage.getItem('telemetry-fuelTankCap');
       const savedDist = localStorage.getItem('telemetry-fuelEndurDist');
-      if (savedCap) { fuelTankCap = parseFloat(savedCap); document.getElementById('fuelTankCap').value = fuelTankCap; }
+      const savedRefueled = localStorage.getItem('telemetry-fuelRefueled');
+      const savedOffset = localStorage.getItem('telemetry-fuelBaseOffset');
+      if (savedCap) { fuelTankCap = parseFloat(savedCap); }
       if (savedDist) { fuelEndurDist = parseFloat(savedDist); document.getElementById('fuelEndurDist').value = fuelEndurDist; }
+      if (savedRefueled) { fuelRefueledTotal = parseFloat(savedRefueled); }
+      if (savedOffset) { fuelBaseOffset = parseFloat(savedOffset); }
+      updateFuelTankDisplay();
+      document.getElementById('fuelRefueled').textContent = fuelRefueledTotal.toFixed(2) + ' L';
     }
     loadFuelSettings();
+
+    // ガソリン投入
+    function addRefuel() {
+      const input = document.getElementById('fuelRefuelInput');
+      const amount = parseFloat(input.value);
+      if (isNaN(amount) || amount <= 0) {
+        addLog('[WARN] 給油量を正しく入力してください');
+        return;
+      }
+      fuelRefueledTotal += amount;
+      localStorage.setItem('telemetry-fuelRefueled', fuelRefueledTotal);
+      document.getElementById('fuelRefueled').textContent = fuelRefueledTotal.toFixed(2) + ' L';
+      input.value = '';
+      addLog('[FUEL] 給油: +' + amount.toFixed(1) + ' L (合計: ' + fuelRefueledTotal.toFixed(2) + ' L)');
+      if (latestData) updateFuelPanel(latestData);
+    }
+
+    // 燃費データリセット
+    function resetFuelData() {
+      if (!confirm('燃費計算データをリセットしますか？\n（給油合計・消費オフセットがリセットされます）')) return;
+      fuelRefueledTotal = 0;
+      // 現在のtotal_fuel_lをオフセットとして保存（以降の消費をゼロからカウント）
+      if (latestData && latestData.total_fuel_l !== undefined) {
+        fuelBaseOffset = parseFloat(latestData.total_fuel_l) || 0;
+      } else {
+        fuelBaseOffset = 0;
+      }
+      localStorage.setItem('telemetry-fuelRefueled', fuelRefueledTotal);
+      localStorage.setItem('telemetry-fuelBaseOffset', fuelBaseOffset);
+      document.getElementById('fuelRefueled').textContent = '0.00 L';
+      addLog('[RESET] 燃費データをリセットしました');
+      if (latestData) updateFuelPanel(latestData);
+    }
 
     function updateFuelPanel(d) {
       const speed = parseFloat(d.kph) || 0;
       const fuelLph = parseFloat(d.calc_fuel_lph) || 0;
-      const totalFuel = parseFloat(d.total_fuel_l) || 0;
+      const rawTotalFuel = parseFloat(d.total_fuel_l) || 0;
+      // オフセットを引いて、リセット後の消費量を算出
+      const totalFuel = Math.max(0, rawTotalFuel - fuelBaseOffset);
 
       // 瞬間燃費 (km/L)
       let instant = 0;
@@ -2532,8 +2807,8 @@
       let avg = instant; // TODO: 正確な平均燃費ロジック
       document.getElementById('fuelAvg').textContent = (speed <= 5 || fuelLph <= 0) ? '--- km/L' : avg.toFixed(2) + ' km/L';
 
-      // 残量推定 (L)
-      let remain = fuelTankCap - totalFuel;
+      // 残量推定 (L) = タンク容量 + 給油合計 - 消費量
+      let remain = fuelTankCap + fuelRefueledTotal - totalFuel;
       if (remain < 0) remain = 0;
       document.getElementById('fuelRemain').textContent = remain.toFixed(2) + ' L';
 
@@ -2614,7 +2889,7 @@
       document.getElementById('infoFreq').textContent = '0 Hz';
       // インジケータも切断状態にする
       document.getElementById('indConn').className = 'ind on-red-pulse';
-      addLog('⚠ データタイムアウト — ' + DATA_TIMEOUT_MS / 1000 + '秒間データ受信なし');
+      addLog('[TIMEOUT] データタイムアウト — ' + DATA_TIMEOUT_MS / 1000 + '秒間データ受信なし');
     }
 
     // データ受信タイマーをリセットする
@@ -2700,7 +2975,7 @@
 
       // 切断状態から復帰した場合ログに記録
       if (wasDisconnected) {
-        addLog('✅ データ受信再開 — 接続復帰');
+        addLog('[CONN] データ受信再開 — 接続復帰');
       }
 
       // Store history（タイムスタンプmsも保存して時間ベースでフィルタ可能にする）
@@ -2830,7 +3105,7 @@
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
-          addLog('⚠ フルスクリーンに切替できませんでした: ' + err.message);
+          addLog('[ERR] フルスクリーンに切替できませんでした: ' + err.message);
         });
       } else {
         document.exitFullscreen();
@@ -2925,7 +3200,7 @@
           document.getElementById('recAutoLabel').textContent = '記録中…';
         }
       }
-      addLog('⚙ 記録モード: ' + (mode === 'manual' ? '手動' : '自動'));
+      addLog('[MODE] 記録モード: ' + (mode === 'manual' ? '手動' : '自動'));
     }
 
     function toggleRecording() {
@@ -2976,7 +3251,7 @@
         }
       }, REC_SAMPLE_INTERVAL);
 
-      addLog('🔴 セッション記録を開始しました');
+      addLog('[REC] セッション記録を開始');
     }
 
     function stopRecording() {
@@ -2992,7 +3267,7 @@
       // UI復帰
       const btn = document.getElementById('recBtn');
       btn.classList.remove('recording');
-      btn.innerHTML = '🔴 記録';
+      btn.innerHTML = 'REC 記録';
       btn.title = '記録開始';
       document.getElementById('recElapsed').style.display = 'none';
 
@@ -3000,7 +3275,7 @@
         document.getElementById('recAutoLabel').textContent = '待機中…';
       }
 
-      addLog('⏹ セッション記録を停止しました（' + recDataPoints.length + 'ポイント）');
+      addLog('[REC] セッション記録を停止 (' + recDataPoints.length + 'ポイント)');
 
       // データがあれば保存ダイアログを表示
       if (recDataPoints.length > 0) {
@@ -3059,11 +3334,11 @@
       try {
         localStorage.setItem(SESSION_META_KEY, JSON.stringify(allMeta));
         localStorage.setItem(SESSION_DATA_PREFIX + sessionId, JSON.stringify(recDataPoints));
-        addLog('💾 セッション「' + name + '」を保存しました');
+        addLog('[SAVE] セッション「' + name + '」を保存');
       } catch (e) {
         if (e.name === 'QuotaExceededError') {
-          alert('⚠ ストレージ容量不足です。走行履歴から古いセッションを削除してください。');
-          addLog('⚠ 保存失敗: ストレージ容量不足');
+          alert('ストレージ容量不足です。走行履歴から古いセッションを削除してください。');
+          addLog('[ERR] 保存失敗: ストレージ容量不足');
         } else {
           alert('保存に失敗しました: ' + e.message);
         }
@@ -3078,7 +3353,7 @@
       if (!confirm('記録データを破棄しますか？')) return;
       recDataPoints = [];
       closeSaveModal();
-      addLog('🗑 記録データを破棄しました');
+      addLog('[DEL] 記録データを破棄');
     }
 
     // ========== 自動モード: エンジン稼働検知 ==========
@@ -3091,13 +3366,13 @@
         // エンジン始動 → 記録開始
         if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
         startRecording();
-        addLog('🔄 自動モード: エンジン稼働を検知 → 記録開始');
+        addLog('[AUTO] エンジン稼働を検知 → 記録開始');
       } else if (!engineRunning && isRecording) {
         // エンジン停止 → 遅延付きで停止
         if (!autoStopTimer) {
           autoStopTimer = setTimeout(() => {
             if (isRecording && recMode === 'auto') {
-              addLog('🔄 自動モード: エンジン停止を検知 → 記録停止');
+              addLog('[AUTO] エンジン停止を検知 → 記録停止');
               stopRecording();
             }
             autoStopTimer = null;
@@ -3149,10 +3424,10 @@
               <div class="session-meta">${date} ｜ ${dur} ｜ ${s.pointCount}pt ｜ ${modeLabel}${s.memo ? ' ｜ ' + escapeHtml(s.memo) : ''}</div>
             </div>
             <div class="session-actions">
-              <button class="session-action-btn" onclick="viewSession('${s.id}')" title="詳細を見る">📊 閲覧</button>
-              <button class="session-action-btn" onclick="downloadSessionCSV('${s.id}')" title="CSVダウンロード">📄 CSV</button>
-              <button class="session-action-btn" onclick="downloadSessionJSON('${s.id}')" title="JSONダウンロード">📋 JSON</button>
-              <button class="session-action-btn delete" onclick="deleteSession('${s.id}', ${i})" title="削除">🗑</button>
+              <button class="session-action-btn" onclick="viewSession('${s.id}')" title="詳細を見る">閲覧</button>
+              <button class="session-action-btn" onclick="downloadSessionCSV('${s.id}')" title="CSVダウンロード">CSV</button>
+              <button class="session-action-btn" onclick="downloadSessionJSON('${s.id}')" title="JSONダウンロード">JSON</button>
+              <button class="session-action-btn delete" onclick="deleteSession('${s.id}', ${i})" title="削除">削除</button>
             </div>
           </li>`;
       });
@@ -3171,7 +3446,7 @@
       localStorage.setItem(SESSION_META_KEY, JSON.stringify(meta));
       localStorage.removeItem(SESSION_DATA_PREFIX + id);
       renderSessionList();
-      addLog('🗑 セッションを削除しました');
+      addLog('[DEL] セッションを削除');
     }
 
     function clearAllSessions() {
@@ -3180,7 +3455,7 @@
       meta.forEach(s => localStorage.removeItem(SESSION_DATA_PREFIX + s.id));
       localStorage.removeItem(SESSION_META_KEY);
       renderSessionList();
-      addLog('🗑 全走行履歴を削除しました');
+      addLog('[DEL] 全走行履歴を削除');
     }
 
     // ========== セッション閲覧（別ページに遷移） ==========
@@ -3229,7 +3504,7 @@
 
       const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.csv';
       downloadBlob(csv, filename, 'text/csv;charset=utf-8;');
-      addLog('📄 CSVダウンロード: ' + filename);
+      addLog('[DL] CSV: ' + filename);
     }
 
     function downloadSessionJSON(id) {
@@ -3245,7 +3520,7 @@
 
       const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.json';
       downloadBlob(JSON.stringify(exportObj, null, 2), filename, 'application/json');
-      addLog('📋 JSONダウンロード: ' + filename);
+      addLog('[DL] JSON: ' + filename);
     }
 
     function downloadBlob(content, filename, mimeType) {
