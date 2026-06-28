@@ -7,7 +7,8 @@
   <title>テレメトリー v3</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
@@ -1303,6 +1304,7 @@
         padding: 6px;
       }
     }
+
     /* ===== SESSION RECORDING ===== */
     .rec-controls {
       display: flex;
@@ -1602,6 +1604,7 @@
       font-size: 12px;
       margin-bottom: 2px;
     }
+
     /* ===== GOPRO CONTROL PANEL ===== */
     .gopro-panel {
       margin-top: 2px;
@@ -1931,7 +1934,8 @@
       <!-- Recording Controls -->
       <div class="rec-controls">
         <div class="rec-mode-toggle">
-          <button class="rec-mode-btn active" id="recModeManual" onclick="setRecMode('manual')" title="手動: ボタンで開始/停止">手動</button>
+          <button class="rec-mode-btn active" id="recModeManual" onclick="setRecMode('manual')"
+            title="手動: ボタンで開始/停止">手動</button>
           <button class="rec-mode-btn" id="recModeAuto" onclick="setRecMode('auto')" title="自動: エンジン稼働で自動記録">自動</button>
         </div>
         <button class="rec-btn" id="recBtn" onclick="toggleRecording()" title="記録開始">REC 記録</button>
@@ -2175,11 +2179,27 @@
 
       <!-- GOPRO CONTROL PANEL -->
       <div class="gopro-panel">
-        <div class="gopro-panel-header" onclick="document.getElementById('goproBody').style.display = document.getElementById('goproBody').style.display === 'none' ? '' : 'none'">
+        <div class="gopro-panel-header"
+          onclick="document.getElementById('goproBody').style.display = document.getElementById('goproBody').style.display === 'none' ? '' : 'none'">
           <div class="panel-title">📷 GoPro制御</div>
           <span class="gopro-toggle-icon" title="開閉">▼</span>
         </div>
         <div class="gopro-body" id="goproBody">
+
+          <!-- ★ 自動モードトグル -->
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;margin-bottom:6px;background:var(--panel);border:1px solid var(--border);border-radius:5px;">
+            <span style="font-size:11px;font-weight:600;color:var(--text);">⚙ 制御モード</span>
+            <div class="rec-mode-toggle" style="margin:0;">
+              <button class="rec-mode-btn active" id="goproModeManualBtn" onclick="setGoProMode('manual')">手動</button>
+              <button class="rec-mode-btn" id="goproModeAutoBtn" onclick="setGoProMode('auto')">自動</button>
+            </div>
+          </div>
+          <div id="goproAutoStatus"
+            style="font-size:10px;color:var(--dim);text-align:center;padding:0 0 6px 0;display:none;">
+            自動モード: エンジン稼働で録画開始/停止
+          </div>
+
           <!-- Status Grid -->
           <div class="gopro-status-grid">
             <div class="gopro-status-item">
@@ -2226,11 +2246,16 @@
           <hr class="gopro-divider">
           <!-- Control Buttons -->
           <div class="gopro-controls">
-            <button class="gopro-btn power-on" id="goproPowerOnBtn" onclick="sendGoProCmd('power_on')" title="GoPro電源ON (Wake)">⚡ 電源ON</button>
-            <button class="gopro-btn power-off" id="goproPowerOffBtn" onclick="sendGoProCmd('power_off')" title="GoPro電源OFF (Sleep)">💤 電源OFF</button>
-            <button class="gopro-btn rec-start" id="goproRecStartBtn" onclick="sendGoProCmd('rec_start')" title="録画開始">🔴 録画開始</button>
-            <button class="gopro-btn rec-stop" id="goproRecStopBtn" onclick="sendGoProCmd('rec_stop')" title="録画停止">⏹ 録画停止</button>
-            <button class="gopro-btn connect" id="goproConnBtn" onclick="sendGoProCmd('scan_connect')" title="スキャン＆接続">🔗 スキャン＆接続</button>
+            <button class="gopro-btn power-on" id="goproPowerOnBtn" onclick="sendGoProCmd('power_on')"
+              title="GoPro電源ON (Wake)">⚡ 電源ON</button>
+            <button class="gopro-btn power-off" id="goproPowerOffBtn" onclick="sendGoProCmd('power_off')"
+              title="GoPro電源OFF (Sleep)">💤 電源OFF</button>
+            <button class="gopro-btn rec-start" id="goproRecStartBtn" onclick="sendGoProCmd('rec_start')"
+              title="録画開始">🔴 録画開始</button>
+            <button class="gopro-btn rec-stop" id="goproRecStopBtn" onclick="sendGoProCmd('rec_stop')" title="録画停止">⏹
+              録画停止</button>
+            <button class="gopro-btn connect" id="goproConnBtn" onclick="sendGoProCmd('scan_connect')"
+              title="スキャン＆接続">🔗 スキャン＆接続</button>
           </div>
           <div class="gopro-cmd-status" id="goproCmdStatus"></div>
         </div>
@@ -2685,13 +2710,25 @@
         });
     }
 
+    function setGoProMode(mode) {
+      const cmd = mode === 'auto' ? 'auto_on' : 'auto_off';
+      sendGoProCmd(cmd);
+      // ボタンUIを即時更新（ESP32からの確認は updateGoProPanel で）
+      document.getElementById('goproModeManualBtn').classList.toggle('active', mode === 'manual');
+      document.getElementById('goproModeAutoBtn').classList.toggle('active', mode === 'auto');
+      document.getElementById('goproAutoStatus').style.display = mode === 'auto' ? '' : 'none';
+      addLog('[GOPRO] 制御モード切替: ' + (mode === 'auto' ? '自動' : '手動'));
+    }
+
     function getCmdLabel(cmd) {
       const labels = {
         'power_on': '電源ON (Wake)',
         'power_off': '電源OFF (Sleep)',
         'rec_start': '録画開始',
         'rec_stop': '録画停止',
-        'scan_connect': 'スキャン＆接続'
+        'scan_connect': 'スキャン＆接続',
+        'auto_on': '自動モードON',
+        'auto_off': '自動モードOFF'
       };
       return labels[cmd] || cmd;
     }
@@ -2724,11 +2761,13 @@
         connVal.textContent = '未接続';
       }
 
-      // --- バッテリ --- (gopro_battery_pct: -1=不明, 0-100)
+      // --- バッテリ --- (gopro_battery_pct: -1=BLE未取得, 0-100)
       const battDot = document.getElementById('goproBattDot');
       const battVal = document.getElementById('goproBattVal');
       const battPct = parseInt(d.gopro_battery_pct);
+      const battLevel = parseInt(d.gopro_battery_level); // 0-3 段階
       if (!isNaN(battPct) && battPct >= 0) {
+        // バッテリー%が取得できている場合
         battVal.textContent = battPct + '%';
         if (battPct > 50) {
           battDot.className = 'gopro-status-dot on';
@@ -2737,9 +2776,20 @@
         } else {
           battDot.className = 'gopro-status-dot recording';
         }
+      } else if (connected && !isNaN(battLevel) && battLevel >= 0) {
+        // %が取れない場合はbattery_level(0-3)でフォールバック表示
+        const levelLabels = ['空', '低', '中', '高'];
+        battVal.textContent = '段階' + battLevel + ' (' + (levelLabels[battLevel] || '?') + ')';
+        if (battLevel >= 2) {
+          battDot.className = 'gopro-status-dot on';
+        } else if (battLevel >= 1) {
+          battDot.className = 'gopro-status-dot warning';
+        } else {
+          battDot.className = 'gopro-status-dot recording';
+        }
       } else {
-        battVal.textContent = '—';
-        battDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+        battVal.textContent = connected ? '不明' : '—';
+        battDot.className = connected ? 'gopro-status-dot warning' : 'gopro-status-dot off';
       }
 
       // --- 充電状態 --- (gopro_charging: "1"/"0")
@@ -2747,8 +2797,13 @@
       const chargeVal = document.getElementById('goproChargeVal');
       const charging = d.gopro_charging === '1' || d.gopro_charging === 1;
       if (connected) {
-        chargeDot.className = charging ? 'gopro-status-dot on' : 'gopro-status-dot off';
-        chargeVal.textContent = charging ? '充電中' : '—';
+        if (charging) {
+          chargeDot.className = 'gopro-status-dot on';
+          chargeVal.textContent = '充電中';
+        } else {
+          chargeDot.className = 'gopro-status-dot off';
+          chargeVal.textContent = '未充電';
+        }
       } else {
         chargeDot.className = 'gopro-status-dot off';
         chargeVal.textContent = '—';
@@ -2761,62 +2816,80 @@
         recDot.className = 'gopro-status-dot recording';
         recVal.textContent = '録画中';
       } else {
-        recDot.className = 'gopro-status-dot off';
-        recVal.textContent = '停止';
+        recDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+        recVal.textContent = connected ? '待機' : '停止';
       }
 
       // --- 録画経過時間 --- (gopro_rec_elapsed_s)
       const recTimeDot = document.getElementById('goproRecTimeDot');
       const recTimeVal = document.getElementById('goproRecTimeVal');
       const recSec = parseInt(d.gopro_rec_elapsed_s);
-      if (recording && !isNaN(recSec) && recSec >= 0) {
-        const mm = Math.floor(recSec / 60);
-        const ss = recSec % 60;
-        recTimeVal.textContent = String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
-        recTimeDot.className = 'gopro-status-dot recording';
+      if (!isNaN(recSec) && recSec >= 0) {
+        if (recording) {
+          const mm = Math.floor(recSec / 60);
+          const ss = recSec % 60;
+          recTimeVal.textContent = String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+          recTimeDot.className = 'gopro-status-dot recording';
+        } else {
+          recTimeVal.textContent = connected ? '00:00' : '—';
+          recTimeDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+        }
       } else {
-        recTimeVal.textContent = '—';
-        recTimeDot.className = 'gopro-status-dot off';
+        recTimeVal.textContent = connected ? '00:00' : '—';
+        recTimeDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
       }
 
-      // --- 内部温度 --- (gopro_internal_temp)
+      // --- 内部温度 --- (gopro_internal_temp: -1=不明)
       const tempDot = document.getElementById('goproTempDot');
       const tempVal = document.getElementById('goproTempVal');
       const gpTemp = parseInt(d.gopro_internal_temp);
-      if (connected && !isNaN(gpTemp) && gpTemp >= 0) {
+      if (connected && !isNaN(gpTemp) && gpTemp > -1) {
         tempVal.textContent = gpTemp + '℃';
         if (gpTemp >= 70) {
-          tempDot.className = 'gopro-status-dot recording'; // 赤点滅
+          tempDot.className = 'gopro-status-dot recording';
         } else if (gpTemp >= 55) {
           tempDot.className = 'gopro-status-dot warning';
         } else {
           tempDot.className = 'gopro-status-dot on';
         }
       } else {
-        tempVal.textContent = '—';
-        tempDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+        tempVal.textContent = connected ? '不明' : '—';
+        tempDot.className = connected ? 'gopro-status-dot warning' : 'gopro-status-dot off';
       }
 
-      // --- SD残量 --- (gopro_sd_remain_min)
+      // --- SD残量 --- (gopro_sd_remain_min: -1=不明)
+      // --- SD残量 (秒単位、-1=不明) ---
       const sdDot = document.getElementById('goproSdDot');
       const sdVal = document.getElementById('goproSdVal');
-      const sdMin = parseInt(d.gopro_sd_remain_min);
-      if (connected && !isNaN(sdMin) && sdMin >= 0) {
-        if (sdMin >= 60) {
-          sdVal.textContent = Math.floor(sdMin / 60) + 'h' + (sdMin % 60) + 'm';
+      const sdSec = parseInt(d.gopro_sd_remain_sec);   // ★ キー名変更
+      if (connected && !isNaN(sdSec) && sdSec >= 0) {
+        const h = Math.floor(sdSec / 3600);
+        const m = Math.floor((sdSec % 3600) / 60);
+        const s = sdSec % 60;
+        if (h > 0) {
+          sdVal.textContent = h + 'h' + String(m).padStart(2, '0') + 'm';
+        } else if (m > 0) {
+          sdVal.textContent = m + 'm' + String(s).padStart(2, '0') + 's';
         } else {
-          sdVal.textContent = sdMin + '分';
+          sdVal.textContent = s + 's';
         }
-        if (sdMin < 10) {
-          sdDot.className = 'gopro-status-dot recording';
-        } else if (sdMin < 30) {
-          sdDot.className = 'gopro-status-dot warning';
-        } else {
-          sdDot.className = 'gopro-status-dot on';
-        }
+        if (sdSec < 600) sdDot.className = 'gopro-status-dot recording';
+        else if (sdSec < 1800) sdDot.className = 'gopro-status-dot warning';
+        else sdDot.className = 'gopro-status-dot on';
       } else {
         sdVal.textContent = '—';
         sdDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+      }
+
+      // --- ★ 自動モード状態を ESP32 側と同期 ---
+      const autoMode = d.gopro_auto_mode === '1' || d.gopro_auto_mode === 1;
+      document.getElementById('goproModeManualBtn').classList.toggle('active', !autoMode);
+      document.getElementById('goproModeAutoBtn').classList.toggle('active', autoMode);
+      document.getElementById('goproAutoStatus').style.display = autoMode ? '' : 'none';
+      // 自動モード時は手動の録画ボタンは無効化（誤操作防止）
+      if (autoMode) {
+        document.getElementById('goproRecStartBtn').disabled = true;
+        document.getElementById('goproRecStopBtn').disabled = true;
       }
 
       // --- ボタン有効/無効 ---
@@ -3516,7 +3589,7 @@
 
     // ========== 新モーダルの背景クリック閉じ ==========
     ['historyModal', 'saveSessionModal', 'versionModal'].forEach(id => {
-      document.getElementById(id).addEventListener('click', function(e) {
+      document.getElementById(id).addEventListener('click', function (e) {
         if (e.target === this) this.classList.remove('open');
       });
     });
