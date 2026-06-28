@@ -1602,8 +1602,8 @@
       font-size: 12px;
       margin-bottom: 2px;
     }
-    /* ===== FUEL PANEL ===== */
-    .fuel-panel {
+    /* ===== GOPRO CONTROL PANEL ===== */
+    .gopro-panel {
       margin-top: 2px;
       margin-bottom: 4px;
       border: 1px solid var(--border);
@@ -1613,7 +1613,7 @@
       flex-shrink: 0;
     }
 
-    .fuel-panel-header {
+    .gopro-panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1624,286 +1624,245 @@
       user-select: none;
     }
 
-    .fuel-panel-header .panel-title {
+    .gopro-panel-header .panel-title {
       margin: 0;
       border: none;
       padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .fuel-panel-header .fuel-gear-icon {
+    .gopro-panel-header .gopro-toggle-icon {
       font-size: 11px;
       color: var(--dim);
-      cursor: pointer;
       padding: 2px 4px;
       border-radius: 4px;
       transition: background .15s;
     }
 
-    .fuel-panel-header .fuel-gear-icon:hover {
-      background: var(--border);
+    .gopro-body {
+      padding: 6px;
     }
 
-    .fuel-body {
-      padding: 4px;
+    /* GoPro status grid */
+    .gopro-status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-bottom: 6px;
     }
 
-    .fuel-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 3px 6px;
-      font-size: 12px;
-    }
-
-    .fuel-row .fuel-label {
-      color: var(--dim);
-      font-size: 12px;
-    }
-
-    .fuel-row .fuel-val {
-      font-family: 'Courier New', monospace;
-      font-weight: 700;
-      color: var(--text);
-      font-size: 13px;
-    }
-
-    .fuel-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 4px 0;
-    }
-
-    .fuel-settings-row {
+    .gopro-status-item {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 3px 4px;
-      font-size: 12px;
-    }
-
-    .fuel-settings-row label {
-      color: var(--dim);
-      font-size: 11px;
-      flex-shrink: 0;
-    }
-
-    .fuel-settings-row input {
-      width: 50px;
-      padding: 2px 4px;
+      padding: 5px 8px;
+      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
+      border-radius: 5px;
       font-size: 11px;
-      text-align: right;
+      transition: all .3s;
+    }
+
+    .gopro-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #bbb;
+      transition: all .3s;
+    }
+
+    .gopro-status-dot.on {
+      background: #4caf50;
+      box-shadow: 0 0 6px #4caf5088;
+    }
+
+    .gopro-status-dot.off {
+      background: #9e9e9e;
+    }
+
+    .gopro-status-dot.recording {
+      background: #f44336;
+      animation: pulseDot 1s ease-in-out infinite;
+    }
+
+    .gopro-status-dot.warning {
+      background: #ff9800;
+      box-shadow: 0 0 6px #ff980088;
+    }
+
+    .gopro-status-label {
+      color: var(--dim);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .gopro-status-val {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 11px;
+      margin-left: auto;
+    }
+
+    /* GoPro control buttons */
+    .gopro-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 6px 0;
+    }
+
+    .gopro-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+
+    .gopro-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 4px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
       background: var(--panel);
       color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
     }
 
-    .fuel-settings-row input:focus {
-      outline: none;
+    .gopro-btn:hover {
+      background: #e8f5e9;
       border-color: var(--accent);
     }
 
-    .fuel-settings-row .fuel-unit {
-      color: var(--dim);
-      font-size: 10px;
+    [data-theme="dark"] .gopro-btn:hover {
+      background: #122712;
+      border-color: var(--accent);
     }
 
-    /* Endurance progress bar */
-    .endurance-bar-wrap {
-      padding: 4px;
+    .gopro-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
-    .endurance-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--dim);
-      margin-bottom: 3px;
-      font-weight: 600;
+    .gopro-btn:disabled:hover {
+      background: var(--panel);
+      border-color: var(--border);
     }
 
-    .endurance-bar {
-      height: 14px;
-      background: var(--border);
-      border-radius: 7px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .endurance-fill {
-      height: 100%;
-      border-radius: 7px;
-      transition: width .5s, background .5s;
-      background: linear-gradient(90deg, var(--accent), #2e7d32);
-      min-width: 0;
-    }
-
-    .endurance-fill.warning {
-      background: linear-gradient(90deg, #f9a825, #ff9800);
-    }
-
-    .endurance-fill.danger {
-      background: linear-gradient(90deg, #ef5350, #d32f2f);
-    }
-
-    .endurance-verdict {
-      text-align: center;
-      padding: 5px;
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 4px;
-      margin-top: 4px;
-    }
-
-    .endurance-verdict.ok {
+    .gopro-btn.power-on {
+      border-color: #4caf50;
       color: #2e7d32;
+    }
+
+    .gopro-btn.power-on:hover {
       background: #e8f5e9;
     }
 
-    .endurance-verdict.warn {
-      color: #e65100;
-      background: #fff3e0;
-    }
-
-    .endurance-verdict.ng {
-      color: #d32f2f;
-      background: #ffebee;
-    }
-
-    [data-theme="dark"] .endurance-verdict.ok {
+    [data-theme="dark"] .gopro-btn.power-on {
       color: #4caf50;
+    }
+
+    [data-theme="dark"] .gopro-btn.power-on:hover {
       background: #122712;
     }
 
-    [data-theme="dark"] .endurance-verdict.warn {
+    .gopro-btn.power-off {
+      border-color: #f44336;
+      color: #d32f2f;
+    }
+
+    .gopro-btn.power-off:hover {
+      background: #ffebee;
+    }
+
+    [data-theme="dark"] .gopro-btn.power-off {
+      color: #ef5350;
+    }
+
+    [data-theme="dark"] .gopro-btn.power-off:hover {
+      background: #2a1010;
+    }
+
+    .gopro-btn.rec-start {
+      border-color: #f44336;
+      color: #d32f2f;
+    }
+
+    .gopro-btn.rec-start:hover {
+      background: #ffebee;
+    }
+
+    [data-theme="dark"] .gopro-btn.rec-start {
+      color: #ef5350;
+    }
+
+    [data-theme="dark"] .gopro-btn.rec-start:hover {
+      background: #2a1010;
+    }
+
+    .gopro-btn.rec-stop {
+      border-color: #ff9800;
+      color: #e65100;
+    }
+
+    .gopro-btn.rec-stop:hover {
+      background: #fff3e0;
+    }
+
+    [data-theme="dark"] .gopro-btn.rec-stop {
       color: #ff9800;
+    }
+
+    [data-theme="dark"] .gopro-btn.rec-stop:hover {
       background: #2a1f00;
     }
 
-    [data-theme="dark"] .endurance-verdict.ng {
-      color: #ef5350;
-      background: #2a1010;
+    .gopro-btn.connect {
+      grid-column: span 2;
+      border-color: #1565c0;
+      color: #1565c0;
     }
 
-    /* Fuel refuel input row */
-    .fuel-refuel-row {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 4px 2px 4px;
+    .gopro-btn.connect:hover {
+      background: #e3f2fd;
     }
 
-    .fuel-refuel-row label {
-      color: var(--dim);
-      font-size: 11px;
-      flex-shrink: 0;
+    [data-theme="dark"] .gopro-btn.connect {
+      color: #42a5f5;
+      border-color: #42a5f5;
     }
 
-    .fuel-refuel-row input {
-      width: 50px;
-      padding: 2px 4px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      text-align: right;
-      background: var(--panel);
-      color: var(--text);
+    [data-theme="dark"] .gopro-btn.connect:hover {
+      background: #0d1f3a;
     }
 
-    .fuel-refuel-row input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .fuel-refuel-row .fuel-unit {
-      color: var(--dim);
+    .gopro-cmd-status {
       font-size: 10px;
-    }
-
-    .fuel-refuel-btn {
-      padding: 2px 8px;
-      border: 1px solid var(--accent);
-      border-radius: 4px;
-      background: var(--accent);
-      color: #fff;
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-      font-family: inherit;
-      flex-shrink: 0;
-    }
-
-    .fuel-refuel-btn:hover {
-      background: #1b5e20;
-    }
-
-    [data-theme="dark"] .fuel-refuel-btn:hover {
-      background: #388e3c;
-    }
-
-    /* Fuel panel action buttons */
-    .fuel-actions {
-      display: flex;
-      gap: 4px;
-      padding: 4px;
-    }
-
-    .fuel-reset-btn {
-      flex: 1;
-      padding: 4px 8px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background: var(--card-bg);
       color: var(--dim);
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-      font-family: inherit;
       text-align: center;
+      padding: 3px 0 0 0;
+      min-height: 16px;
     }
 
-    .fuel-reset-btn:hover {
-      background: #ffebee;
-      color: #d32f2f;
-      border-color: #f44336;
+    .gopro-cmd-status.sending {
+      color: #ff9800;
     }
 
-    [data-theme="dark"] .fuel-reset-btn:hover {
-      background: #2a1010;
-      color: #ef5350;
-      border-color: #f44336;
+    .gopro-cmd-status.ok {
+      color: #4caf50;
     }
 
-    /* Tank capacity display in fuel panel */
-    .fuel-tank-display {
-      font-size: 11px;
-      color: var(--dim);
-      padding: 3px 6px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .fuel-tank-display .tank-val {
-      font-family: 'Courier New', monospace;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .fuel-tank-display .tank-edit-hint {
-      font-size: 9px;
-      color: var(--dim);
-      cursor: pointer;
-      text-decoration: underline;
-      transition: color .2s;
-    }
-
-    .fuel-tank-display .tank-edit-hint:hover {
-      color: var(--accent);
+    .gopro-cmd-status.error {
+      color: #f44336;
     }
 
     /* Settings section in alert modal */
@@ -2001,20 +1960,7 @@
         <button class="modal-close" onclick="closeAlertModal()">✕</button>
       </div>
       <div class="modal-body">
-        <!-- 燃費設定セクション -->
-        <div class="settings-section">
-          <div class="settings-section-title">燃費設定</div>
-          <div class="settings-row">
-            <label>タンク容量</label>
-            <input type="number" step="0.1" id="settingsTankCap" value="3.5">
-            <span class="settings-unit">L</span>
-          </div>
-          <div class="settings-row">
-            <label>エンデュ距離</label>
-            <input type="number" step="0.1" id="settingsEndurDist" value="22">
-            <span class="settings-unit">km</span>
-          </div>
-        </div>
+
         <!-- アラート設定セクション -->
         <div class="alert-info">
           <strong>アラート設定：</strong>各パラメータの下限・上限を設定してください。値がしきい値を超えると、データカードが<span
@@ -2227,66 +2173,66 @@
         </div>
       </div>
 
-      <!-- FUEL PANEL -->
-      <div class="fuel-panel">
-        <div class="fuel-panel-header" onclick="document.getElementById('fuelBody').style.display = document.getElementById('fuelBody').style.display === 'none' ? '' : 'none'">
-          <div class="panel-title">燃費・残量予測</div>
-          <span class="fuel-gear-icon" title="開閉">▼</span>
+      <!-- GOPRO CONTROL PANEL -->
+      <div class="gopro-panel">
+        <div class="gopro-panel-header" onclick="document.getElementById('goproBody').style.display = document.getElementById('goproBody').style.display === 'none' ? '' : 'none'">
+          <div class="panel-title">📷 GoPro制御</div>
+          <span class="gopro-toggle-icon" title="開閉">▼</span>
         </div>
-        <div class="fuel-body" id="fuelBody">
-          <div class="fuel-tank-display">
-            タンク容量: <span class="tank-val" id="fuelTankCapDisplay">3.5</span> L
-            <span class="tank-edit-hint" onclick="openAlertModal()" title="設定で変更">変更</span>
-          </div>
-          <div class="fuel-settings-row">
-            <label>エンデュ距離</label>
-            <input type="number" step="0.1" id="fuelEndurDist" value="22" onchange="saveFuelSettings()">
-            <span class="fuel-unit">km</span>
-          </div>
-          <hr class="fuel-divider">
-          <!-- ガソリン投入量 -->
-          <div class="fuel-refuel-row">
-            <label>給油量</label>
-            <input type="number" step="0.1" id="fuelRefuelInput" value="" placeholder="0.0">
-            <span class="fuel-unit">L</span>
-            <button class="fuel-refuel-btn" onclick="addRefuel()" title="給油量を反映">投入</button>
-          </div>
-          <hr class="fuel-divider">
-          <div class="fuel-row">
-            <span class="fuel-label">瞬間燃費</span>
-            <span class="fuel-val" id="fuelInstant">— km/L</span>
-          </div>
-          <div class="fuel-row">
-            <span class="fuel-label">平均燃費</span>
-            <span class="fuel-val" id="fuelAvg">— km/L</span>
-          </div>
-          <div class="fuel-row">
-            <span class="fuel-label">残量推定</span>
-            <span class="fuel-val" id="fuelRemain">— L</span>
-          </div>
-          <div class="fuel-row">
-            <span class="fuel-label">走行可能</span>
-            <span class="fuel-val" id="fuelRange">—</span>
-          </div>
-          <div class="fuel-row">
-            <span class="fuel-label">給油済み合計</span>
-            <span class="fuel-val" id="fuelRefueled">0.00 L</span>
-          </div>
-          <hr class="fuel-divider">
-          <div class="endurance-bar-wrap">
-            <div class="endurance-label">
-              <span>エンデュランス完走判定</span>
-              <span id="endurPercent">—%</span>
+        <div class="gopro-body" id="goproBody">
+          <!-- Status Grid -->
+          <div class="gopro-status-grid">
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproPowerDot"></div>
+              <span class="gopro-status-label">電源</span>
+              <span class="gopro-status-val" id="goproPowerVal">OFF</span>
             </div>
-            <div class="endurance-bar">
-              <div class="endurance-fill" id="endurFill" style="width:0%"></div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproConnDot"></div>
+              <span class="gopro-status-label">接続</span>
+              <span class="gopro-status-val" id="goproConnVal">未接続</span>
             </div>
-            <div class="endurance-verdict" id="endurVerdict" style="display:none"></div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproBattDot"></div>
+              <span class="gopro-status-label">🔋 バッテリ</span>
+              <span class="gopro-status-val" id="goproBattVal">—</span>
+            </div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproChargeDot"></div>
+              <span class="gopro-status-label">充電</span>
+              <span class="gopro-status-val" id="goproChargeVal">—</span>
+            </div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproRecDot"></div>
+              <span class="gopro-status-label">🎥 録画</span>
+              <span class="gopro-status-val" id="goproRecVal">停止</span>
+            </div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproRecTimeDot"></div>
+              <span class="gopro-status-label">経過</span>
+              <span class="gopro-status-val" id="goproRecTimeVal">—</span>
+            </div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproTempDot"></div>
+              <span class="gopro-status-label">🌡 温度</span>
+              <span class="gopro-status-val" id="goproTempVal">—</span>
+            </div>
+            <div class="gopro-status-item">
+              <div class="gopro-status-dot off" id="goproSdDot"></div>
+              <span class="gopro-status-label">💾 SD残</span>
+              <span class="gopro-status-val" id="goproSdVal">—</span>
+            </div>
           </div>
-          <!-- リセットボタン -->
-          <div class="fuel-actions">
-            <button class="fuel-reset-btn" onclick="resetFuelData()" title="燃費データをリセット">リセット</button>
+          <hr class="gopro-divider">
+          <!-- Control Buttons -->
+          <div class="gopro-controls">
+            <button class="gopro-btn power-on" id="goproPowerOnBtn" onclick="sendGoProCmd('power_on')" title="GoPro電源ON (Wake)">⚡ 電源ON</button>
+            <button class="gopro-btn power-off" id="goproPowerOffBtn" onclick="sendGoProCmd('power_off')" title="GoPro電源OFF (Sleep)">💤 電源OFF</button>
+            <button class="gopro-btn rec-start" id="goproRecStartBtn" onclick="sendGoProCmd('rec_start')" title="録画開始">🔴 録画開始</button>
+            <button class="gopro-btn rec-stop" id="goproRecStopBtn" onclick="sendGoProCmd('rec_stop')" title="録画停止">⏹ 録画停止</button>
+            <button class="gopro-btn connect" id="goproConnBtn" onclick="sendGoProCmd('scan_connect')" title="スキャン＆接続">🔗 スキャン＆接続</button>
           </div>
+          <div class="gopro-cmd-status" id="goproCmdStatus"></div>
         </div>
       </div>
     </div>
@@ -2579,9 +2525,6 @@
 
     function openAlertModal() {
       populateAlertTable();
-      // 設定モーダルに現在の燃費設定を反映
-      document.getElementById('settingsTankCap').value = fuelTankCap;
-      document.getElementById('settingsEndurDist').value = fuelEndurDist;
       document.getElementById('alertModal').classList.add('open');
     }
 
@@ -2590,8 +2533,6 @@
     }
 
     function saveAlertSettings() {
-      // 燃費設定を保存
-      saveFuelSettingsFromModal();
       // テーブルから値を読み取り
       ALERT_PARAMS.forEach(p => {
         const chk = document.querySelector(`input.enabled-check[data-key="${p.key}"]`);
@@ -2710,151 +2651,180 @@
       document.getElementById('rpmValue').textContent = Math.round(rpm);
     }
 
-    // ========== Fuel Calculations ==========
-    let fuelTankCap = 3.5;
-    let fuelEndurDist = 22.0;
-    let fuelRefueledTotal = 0; // 給油済み合計 (L)
-    let fuelBaseOffset = 0; // リセット時のtotal_fuel_lオフセット
+    // ========== GoPro Control ==========
+    const goproCmdRef = db.ref('commands/gopro');
+    const goproCmdAckRef = db.ref('commands/gopro_ack');
+    let goproState = { connected: false, recording: false };
 
-    function saveFuelSettings() {
-      fuelEndurDist = parseFloat(document.getElementById('fuelEndurDist').value) || 22.0;
-      localStorage.setItem('telemetry-fuelTankCap', fuelTankCap);
-      localStorage.setItem('telemetry-fuelEndurDist', fuelEndurDist);
-      localStorage.setItem('telemetry-fuelRefueled', fuelRefueledTotal);
-      localStorage.setItem('telemetry-fuelBaseOffset', fuelBaseOffset);
-      updateFuelTankDisplay();
-      if (latestData) updateFuelPanel(latestData);
+    function sendGoProCmd(cmd) {
+      const statusEl = document.getElementById('goproCmdStatus');
+      statusEl.textContent = '送信中...';
+      statusEl.className = 'gopro-cmd-status sending';
+
+      const cmdData = {
+        command: cmd,
+        timestamp: Date.now(),
+        source: 'web'
+      };
+
+      goproCmdRef.set(cmdData)
+        .then(() => {
+          statusEl.textContent = '✓ コマンド送信: ' + getCmdLabel(cmd);
+          statusEl.className = 'gopro-cmd-status ok';
+          addLog('[GOPRO] コマンド送信: ' + getCmdLabel(cmd));
+          // 3秒後にステータス表示をクリア
+          setTimeout(() => {
+            statusEl.textContent = '';
+            statusEl.className = 'gopro-cmd-status';
+          }, 3000);
+        })
+        .catch(err => {
+          statusEl.textContent = '✗ 送信失敗';
+          statusEl.className = 'gopro-cmd-status error';
+          addLog('[GOPRO ERR] コマンド送信失敗: ' + err.message);
+        });
     }
 
-    function saveFuelSettingsFromModal() {
-      fuelTankCap = parseFloat(document.getElementById('settingsTankCap').value) || 3.5;
-      fuelEndurDist = parseFloat(document.getElementById('settingsEndurDist').value) || 22.0;
-      localStorage.setItem('telemetry-fuelTankCap', fuelTankCap);
-      localStorage.setItem('telemetry-fuelEndurDist', fuelEndurDist);
-      // 燃費パネルのUI同期
-      document.getElementById('fuelEndurDist').value = fuelEndurDist;
-      updateFuelTankDisplay();
-      if (latestData) updateFuelPanel(latestData);
+    function getCmdLabel(cmd) {
+      const labels = {
+        'power_on': '電源ON (Wake)',
+        'power_off': '電源OFF (Sleep)',
+        'rec_start': '録画開始',
+        'rec_stop': '録画停止',
+        'scan_connect': 'スキャン＆接続'
+      };
+      return labels[cmd] || cmd;
     }
 
-    function updateFuelTankDisplay() {
-      document.getElementById('fuelTankCapDisplay').textContent = fuelTankCap.toFixed(1);
-    }
+    function updateGoProPanel(d) {
+      const connected = d.gopro_connected === '1' || d.gopro_connected === 1;
+      const recording = d.gopro_recording === '1' || d.gopro_recording === 1;
+      goproState.connected = connected;
+      goproState.recording = recording;
 
-    function loadFuelSettings() {
-      const savedCap = localStorage.getItem('telemetry-fuelTankCap');
-      const savedDist = localStorage.getItem('telemetry-fuelEndurDist');
-      const savedRefueled = localStorage.getItem('telemetry-fuelRefueled');
-      const savedOffset = localStorage.getItem('telemetry-fuelBaseOffset');
-      if (savedCap) { fuelTankCap = parseFloat(savedCap); }
-      if (savedDist) { fuelEndurDist = parseFloat(savedDist); document.getElementById('fuelEndurDist').value = fuelEndurDist; }
-      if (savedRefueled) { fuelRefueledTotal = parseFloat(savedRefueled); }
-      if (savedOffset) { fuelBaseOffset = parseFloat(savedOffset); }
-      updateFuelTankDisplay();
-      document.getElementById('fuelRefueled').textContent = fuelRefueledTotal.toFixed(2) + ' L';
-    }
-    loadFuelSettings();
-
-    // ガソリン投入
-    function addRefuel() {
-      const input = document.getElementById('fuelRefuelInput');
-      const amount = parseFloat(input.value);
-      if (isNaN(amount) || amount <= 0) {
-        addLog('[WARN] 給油量を正しく入力してください');
-        return;
-      }
-      fuelRefueledTotal += amount;
-      localStorage.setItem('telemetry-fuelRefueled', fuelRefueledTotal);
-      document.getElementById('fuelRefueled').textContent = fuelRefueledTotal.toFixed(2) + ' L';
-      input.value = '';
-      addLog('[FUEL] 給油: +' + amount.toFixed(1) + ' L (合計: ' + fuelRefueledTotal.toFixed(2) + ' L)');
-      if (latestData) updateFuelPanel(latestData);
-    }
-
-    // 燃費データリセット
-    function resetFuelData() {
-      if (!confirm('燃費計算データをリセットしますか？\n（給油合計・消費オフセットがリセットされます）')) return;
-      fuelRefueledTotal = 0;
-      // 現在のtotal_fuel_lをオフセットとして保存（以降の消費をゼロからカウント）
-      if (latestData && latestData.total_fuel_l !== undefined) {
-        fuelBaseOffset = parseFloat(latestData.total_fuel_l) || 0;
+      // --- 電源状態 ---
+      const powerDot = document.getElementById('goproPowerDot');
+      const powerVal = document.getElementById('goproPowerVal');
+      if (connected) {
+        powerDot.className = 'gopro-status-dot on';
+        powerVal.textContent = 'ON';
       } else {
-        fuelBaseOffset = 0;
-      }
-      localStorage.setItem('telemetry-fuelRefueled', fuelRefueledTotal);
-      localStorage.setItem('telemetry-fuelBaseOffset', fuelBaseOffset);
-      document.getElementById('fuelRefueled').textContent = '0.00 L';
-      addLog('[RESET] 燃費データをリセットしました');
-      if (latestData) updateFuelPanel(latestData);
-    }
-
-    function updateFuelPanel(d) {
-      const speed = parseFloat(d.kph) || 0;
-      const fuelLph = parseFloat(d.calc_fuel_lph) || 0;
-      const rawTotalFuel = parseFloat(d.total_fuel_l) || 0;
-      // オフセットを引いて、リセット後の消費量を算出
-      const totalFuel = Math.max(0, rawTotalFuel - fuelBaseOffset);
-
-      // 瞬間燃費 (km/L)
-      let instant = 0;
-      if (fuelLph > 0 && speed > 5) {
-        instant = speed / fuelLph;
-      }
-      document.getElementById('fuelInstant').textContent = (speed <= 5 || fuelLph <= 0) ? '--- km/L' : instant.toFixed(2) + ' km/L';
-
-      // 平均燃費 (仮に現在の瞬間燃費のローパスフィルターまたは総走行距離/総燃料で出すべきだが、今回はセッション距離がないため簡易的に計算)
-      // セッション記録中ならデータから平均を出せるが、今回はリアルタイムデータから簡易表示
-      let avg = instant; // TODO: 正確な平均燃費ロジック
-      document.getElementById('fuelAvg').textContent = (speed <= 5 || fuelLph <= 0) ? '--- km/L' : avg.toFixed(2) + ' km/L';
-
-      // 残量推定 (L) = タンク容量 + 給油合計 - 消費量
-      let remain = fuelTankCap + fuelRefueledTotal - totalFuel;
-      if (remain < 0) remain = 0;
-      document.getElementById('fuelRemain').textContent = remain.toFixed(2) + ' L';
-
-      // 走行可能 (km)
-      let range = 0;
-      if (instant > 0) range = remain * instant;
-      document.getElementById('fuelRange').textContent = (range > 0) ? range.toFixed(1) + ' km' : '---';
-
-      // エンデュランス完走判定
-      let percent = 0;
-      if (fuelEndurDist > 0 && instant > 0) {
-        // 完走に必要な燃料
-        const reqFuel = fuelEndurDist / instant;
-        percent = (remain / reqFuel) * 100;
-      } else if (speed <= 5 || fuelLph <= 0) {
-        percent = 100; // 停止中は計算不可として100%表示にしておくか、前回値を保持
+        powerDot.className = 'gopro-status-dot off';
+        powerVal.textContent = 'OFF';
       }
 
-      if (percent > 100) percent = 100;
-      if (percent < 0) percent = 0;
-
-      const fill = document.getElementById('endurFill');
-      fill.style.width = percent + '%';
-      document.getElementById('endurPercent').textContent = percent.toFixed(0) + '%';
-
-      const verdict = document.getElementById('endurVerdict');
-      verdict.style.display = 'block';
-
-      if (speed <= 5 || fuelLph <= 0) {
-        verdict.className = 'endurance-verdict';
-        verdict.textContent = '計算待機中...';
-        verdict.style.display = 'none'; // 停止中は非表示でも良い
-        fill.className = 'endurance-fill';
-      } else if (percent >= 100) {
-        verdict.className = 'endurance-verdict ok';
-        verdict.textContent = '完走可能ペース';
-        fill.className = 'endurance-fill';
-      } else if (percent >= 80) {
-        verdict.className = 'endurance-verdict warn';
-        verdict.textContent = '警告: 燃料ギリギリ';
-        fill.className = 'endurance-fill warning';
+      // --- 接続状態 ---
+      const connDot = document.getElementById('goproConnDot');
+      const connVal = document.getElementById('goproConnVal');
+      if (connected) {
+        connDot.className = 'gopro-status-dot on';
+        connVal.textContent = '接続中';
       } else {
-        verdict.className = 'endurance-verdict ng';
-        verdict.textContent = '危険: 完走不可ペース';
-        fill.className = 'endurance-fill danger';
+        connDot.className = 'gopro-status-dot off';
+        connVal.textContent = '未接続';
       }
+
+      // --- バッテリ --- (gopro_battery_pct: -1=不明, 0-100)
+      const battDot = document.getElementById('goproBattDot');
+      const battVal = document.getElementById('goproBattVal');
+      const battPct = parseInt(d.gopro_battery_pct);
+      if (!isNaN(battPct) && battPct >= 0) {
+        battVal.textContent = battPct + '%';
+        if (battPct > 50) {
+          battDot.className = 'gopro-status-dot on';
+        } else if (battPct > 20) {
+          battDot.className = 'gopro-status-dot warning';
+        } else {
+          battDot.className = 'gopro-status-dot recording';
+        }
+      } else {
+        battVal.textContent = '—';
+        battDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+      }
+
+      // --- 充電状態 --- (gopro_charging: "1"/"0")
+      const chargeDot = document.getElementById('goproChargeDot');
+      const chargeVal = document.getElementById('goproChargeVal');
+      const charging = d.gopro_charging === '1' || d.gopro_charging === 1;
+      if (connected) {
+        chargeDot.className = charging ? 'gopro-status-dot on' : 'gopro-status-dot off';
+        chargeVal.textContent = charging ? '充電中' : '—';
+      } else {
+        chargeDot.className = 'gopro-status-dot off';
+        chargeVal.textContent = '—';
+      }
+
+      // --- 録画状態 ---
+      const recDot = document.getElementById('goproRecDot');
+      const recVal = document.getElementById('goproRecVal');
+      if (recording) {
+        recDot.className = 'gopro-status-dot recording';
+        recVal.textContent = '録画中';
+      } else {
+        recDot.className = 'gopro-status-dot off';
+        recVal.textContent = '停止';
+      }
+
+      // --- 録画経過時間 --- (gopro_rec_elapsed_s)
+      const recTimeDot = document.getElementById('goproRecTimeDot');
+      const recTimeVal = document.getElementById('goproRecTimeVal');
+      const recSec = parseInt(d.gopro_rec_elapsed_s);
+      if (recording && !isNaN(recSec) && recSec >= 0) {
+        const mm = Math.floor(recSec / 60);
+        const ss = recSec % 60;
+        recTimeVal.textContent = String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+        recTimeDot.className = 'gopro-status-dot recording';
+      } else {
+        recTimeVal.textContent = '—';
+        recTimeDot.className = 'gopro-status-dot off';
+      }
+
+      // --- 内部温度 --- (gopro_internal_temp)
+      const tempDot = document.getElementById('goproTempDot');
+      const tempVal = document.getElementById('goproTempVal');
+      const gpTemp = parseInt(d.gopro_internal_temp);
+      if (connected && !isNaN(gpTemp) && gpTemp >= 0) {
+        tempVal.textContent = gpTemp + '℃';
+        if (gpTemp >= 70) {
+          tempDot.className = 'gopro-status-dot recording'; // 赤点滅
+        } else if (gpTemp >= 55) {
+          tempDot.className = 'gopro-status-dot warning';
+        } else {
+          tempDot.className = 'gopro-status-dot on';
+        }
+      } else {
+        tempVal.textContent = '—';
+        tempDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+      }
+
+      // --- SD残量 --- (gopro_sd_remain_min)
+      const sdDot = document.getElementById('goproSdDot');
+      const sdVal = document.getElementById('goproSdVal');
+      const sdMin = parseInt(d.gopro_sd_remain_min);
+      if (connected && !isNaN(sdMin) && sdMin >= 0) {
+        if (sdMin >= 60) {
+          sdVal.textContent = Math.floor(sdMin / 60) + 'h' + (sdMin % 60) + 'm';
+        } else {
+          sdVal.textContent = sdMin + '分';
+        }
+        if (sdMin < 10) {
+          sdDot.className = 'gopro-status-dot recording';
+        } else if (sdMin < 30) {
+          sdDot.className = 'gopro-status-dot warning';
+        } else {
+          sdDot.className = 'gopro-status-dot on';
+        }
+      } else {
+        sdVal.textContent = '—';
+        sdDot.className = connected ? 'gopro-status-dot on' : 'gopro-status-dot off';
+      }
+
+      // --- ボタン有効/無効 ---
+      document.getElementById('goproPowerOnBtn').disabled = connected;
+      document.getElementById('goproPowerOffBtn').disabled = !connected;
+      document.getElementById('goproRecStartBtn').disabled = !connected || recording;
+      document.getElementById('goproRecStopBtn').disabled = !connected || !recording;
+      document.getElementById('goproConnBtn').disabled = connected;
     }
 
     // ========== Log ==========
@@ -3034,8 +3004,8 @@
       latestData = d;
       handleAutoMode(d);
 
-      // ===== 燃費計算 & パネル更新 =====
-      updateFuelPanel(d);
+      // ===== GoPro パネル更新 =====
+      updateGoProPanel(d);
 
       // Log (throttle to ~2/sec)
       if (now - lastTs >= 500) {
