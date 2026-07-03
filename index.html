@@ -2267,6 +2267,31 @@
           <div class="value" id="dFuelLph">—</div>
           <div class="unit">L/h</div>
         </div>
+
+        <!-- SERVO ESP32 DATA -->
+        <div class="data-card" id="card_servo_push">
+          <div class="label">PUSH_US</div>
+          <div class="value" id="dServoPush">—</div>
+          <div class="unit">us</div>
+        </div>
+
+        <div class="data-card" id="card_servo_current">
+          <div class="label">Servo Now</div>
+          <div class="value" id="dServoCurrent">—</div>
+          <div class="unit">us</div>
+        </div>
+
+        <div class="data-card" id="card_servo_sw">
+          <div class="label">Servo SW</div>
+          <div class="value" id="dServoSw">—</div>
+          <div class="unit"></div>
+        </div>
+
+        <div class="data-card" id="card_servo_vola">
+          <div class="label">Vol A</div>
+          <div class="value" id="dServoVolA">—</div>
+          <div class="unit">raw</div>
+        </div>
       </div>
 
       <!-- GOPRO CONTROL PANEL -->
@@ -2553,6 +2578,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const dataRef = db.ref("livedata/dashboard");
+    const servoRef = db.ref("livedata/servo");
     const alertSettingsRef = db.ref("settings/alert_thresholds");
 
     // ========== State ==========
@@ -3018,6 +3044,22 @@
       logArea.scrollTop = logArea.scrollHeight;
     }
     function clearLog() { logArea.innerHTML = ''; logCount = 0; }
+
+    // ========== Servo ESP32 Listener ==========
+    servoRef.on('value', snap => {
+      const s = snap.val();
+      if (!s) return;
+
+      const setServoText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+
+      setServoText('dServoPush', s.push_us ?? '—');
+      setServoText('dServoCurrent', s.current_us ?? '—');
+      setServoText('dServoSw', s.switch_state !== undefined ? (Number(s.switch_state) === 1 ? 'ON' : 'OFF') : '—');
+      setServoText('dServoVolA', s.vol_a_raw ?? '—');
+    });
 
     // ========== Frequency tracker ==========
     freqInterval = setInterval(() => {
