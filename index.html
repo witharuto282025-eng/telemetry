@@ -2292,6 +2292,17 @@
           <div class="value" id="dServoVolA">—</div>
           <div class="unit">raw</div>
         </div>
+
+        <div class="data-card full" id="card_servo_push_set">
+          <div class="label">PUSH_US 設定</div>
+          <div style="display:flex;gap:6px;justify-content:center;align-items:center;margin-top:4px;">
+            <input id="servoPushInput" type="number" min="500" max="2500" step="1" value="1425"
+              style="width:86px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);font-family:'Courier New',monospace;text-align:right;">
+            <button onclick="sendServoPushUs()"
+              style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);cursor:pointer;font-size:11px;font-weight:700;">送信</button>
+          </div>
+          <div class="unit" id="dServoPushSetStatus">Firebaseへ設定値を書き込み</div>
+        </div>
       </div>
 
       <!-- GOPRO CONTROL PANEL -->
@@ -2579,6 +2590,7 @@
     const db = firebase.database();
     const dataRef = db.ref("livedata/dashboard");
     const servoRef = db.ref("livedata/servo");
+    const servoConfigRef = db.ref("livedata/servo_config");
     const alertSettingsRef = db.ref("settings/alert_thresholds");
 
     // ========== State ==========
@@ -3059,7 +3071,46 @@
       setServoText('dServoCurrent', s.current_us ?? '—');
       setServoText('dServoSw', s.switch_state !== undefined ? (Number(s.switch_state) === 1 ? 'ON' : 'OFF') : '—');
       setServoText('dServoVolA', s.vol_a_raw ?? '—');
+
+      const input = document.getElementById('servoPushInput');
+      if (input && document.activeElement !== input && s.push_us !== undefined) {
+        input.value = s.push_us;
+      }
     });
+
+    servoConfigRef.on('value', snap => {
+      const c = snap.val();
+      if (!c) return;
+      const input = document.getElementById('servoPushInput');
+      if (input && document.activeElement !== input && c.push_us !== undefined) {
+        input.value = c.push_us;
+      }
+    });
+
+    function sendServoPushUs() {
+      const input = document.getElementById('servoPushInput');
+      const status = document.getElementById('dServoPushSetStatus');
+      if (!input) return;
+
+      const value = parseInt(input.value, 10);
+      if (isNaN(value) || value < 500 || value > 2500) {
+        if (status) status.textContent = '500〜2500 usで入力';
+        addLog('[SERVO ERR] PUSH_US設定値が範囲外: ' + input.value);
+        return;
+      }
+
+      servoConfigRef.update({
+        push_us: value,
+        updated_at: Date.now(),
+        source: 'web'
+      }).then(() => {
+        if (status) status.textContent = '送信済み: ' + value + ' us';
+        addLog('[SERVO] PUSH_US設定を送信: ' + value + ' us');
+      }).catch(err => {
+        if (status) status.textContent = '送信失敗';
+        addLog('[SERVO ERR] PUSH_US設定送信失敗: ' + err.message);
+      });
+    }
 
     // ========== Frequency tracker ==========
     freqInterval = setInterval(() => {
