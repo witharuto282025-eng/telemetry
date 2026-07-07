@@ -2406,39 +2406,50 @@
         </div>
         <div class="suspension-body">
           <div class="data-grid">
-            <div class="data-card" id="card_servo_push">
-              <div class="label">PUSH_US</div>
-              <div class="value" id="dServoPush">—</div>
-              <div class="unit">us</div>
+            <div class="data-card" id="card_servo_home">
+              <div class="label">イニシャル</div>
+              <div class="value" id="dServoHome">—</div>
+              <div class="unit">step</div>
             </div>
 
-            <div class="data-card" id="card_servo_current">
-              <div class="label">Servo Now</div>
-              <div class="value" id="dServoCurrent">—</div>
-              <div class="unit">us</div>
+            <div class="data-card" id="card_servo_push">
+              <div class="label">ボタン押し後</div>
+              <div class="value" id="dServoPush">—</div>
+              <div class="unit">step</div>
             </div>
 
             <div class="data-card" id="card_servo_sw">
-              <div class="label">Servo SW</div>
+              <div class="label">ボタン</div>
               <div class="value" id="dServoSw">—</div>
               <div class="unit"></div>
             </div>
 
             <div class="data-card" id="card_servo_vola">
-              <div class="label">Vol A</div>
+              <div class="label">つまみ</div>
               <div class="value" id="dServoVolA">—</div>
               <div class="unit">raw</div>
             </div>
 
-            <div class="data-card full" id="card_servo_push_set">
-              <div class="label">PUSH_US 設定</div>
+            <div class="data-card full" id="card_servo_home_set">
+              <div class="label">イニシャル 設定</div>
               <div style="display:flex;gap:6px;justify-content:center;align-items:center;margin-top:4px;">
-                <input id="servoPushInput" type="number" min="500" max="2500" step="1" value="1425"
+                <input id="servoHomeInput" type="number" min="-31" max="30" step="1" value="0"
+                  style="width:86px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);font-family:'Courier New',monospace;text-align:right;">
+                <button onclick="sendServoHomeUs()"
+                  style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);cursor:pointer;font-size:11px;font-weight:700;">送信</button>
+              </div>
+              <div class="unit" id="dServoHomeSetStatus"></div>
+            </div>
+
+            <div class="data-card full" id="card_servo_push_set">
+              <div class="label">ボタン押し後 設定</div>
+              <div style="display:flex;gap:6px;justify-content:center;align-items:center;margin-top:4px;">
+                <input id="servoPushInput" type="number" min="-31" max="30" step="1" value="2"
                   style="width:86px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);font-family:'Courier New',monospace;text-align:right;">
                 <button onclick="sendServoPushUs()"
                   style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text);cursor:pointer;font-size:11px;font-weight:700;">送信</button>
               </div>
-              <div class="unit" id="dServoPushSetStatus">Firebaseへ設定値を書き込み</div>
+              <div class="unit" id="dServoPushSetStatus"></div>
             </div>
           </div>
         </div>
@@ -3196,6 +3207,55 @@
     }
     function clearLog() { logArea.innerHTML = ''; logCount = 0; }
 
+    // ========== Servo step scale ==========
+    const SERVO_STEP_US = 32.5;
+    const SERVO_HOME_US_FALLBACK = 1490;
+    let latestServoHomeUs = SERVO_HOME_US_FALLBACK;
+
+    function usToServoStep(us, homeUs = latestServoHomeUs) {
+      const u = Number(us);
+      const h = Number(homeUs);
+      if (isNaN(u) || isNaN(h)) return null;
+      return (h - u) / SERVO_STEP_US;
+    }
+
+    function servoStepToUs(step, homeUs = latestServoHomeUs) {
+      const st = Number(step);
+      const h = Number(homeUs);
+      if (isNaN(st) || isNaN(h)) return null;
+      return Math.round(h - st * SERVO_STEP_US);
+    }
+
+    function homeUsToStep(homeUs) {
+      const h = Number(homeUs);
+      if (isNaN(h)) return null;
+      return (SERVO_HOME_US_FALLBACK - h) / SERVO_STEP_US;
+    }
+
+    function homeStepToUs(step) {
+      const st = Number(step);
+      if (isNaN(st)) return null;
+      return Math.round(SERVO_HOME_US_FALLBACK - st * SERVO_STEP_US);
+    }
+
+    function updateServoStepInputLimits() {
+      const homeInput = document.getElementById('servoHomeInput');
+      if (homeInput) {
+        homeInput.min = Math.ceil((SERVO_HOME_US_FALLBACK - 2500) / SERVO_STEP_US);
+        homeInput.max = Math.floor((SERVO_HOME_US_FALLBACK - 500) / SERVO_STEP_US);
+        homeInput.step = 1;
+      }
+
+      const pushInput = document.getElementById('servoPushInput');
+      if (pushInput) {
+        pushInput.min = Math.ceil((latestServoHomeUs - 2500) / SERVO_STEP_US);
+        pushInput.max = Math.floor((latestServoHomeUs - 500) / SERVO_STEP_US);
+        pushInput.step = 1;
+      }
+    }
+
+    updateServoStepInputLimits();
+
     // ========== Servo ESP32 Listener ==========
     servoRef.on('value', snap => {
       const s = snap.val();
@@ -3216,48 +3276,105 @@
         if (el) el.textContent = value;
       };
 
-      setServoText('dServoPush', s.push_us ?? '—');
-      setServoText('dServoCurrent', s.current_us ?? '—');
+      if (s.home_us !== undefined) {
+        latestServoHomeUs = Number(s.home_us);
+        updateServoStepInputLimits();
+      }
+
+      const homeStep = homeUsToStep(latestServoHomeUs);
+      const pushStep = usToServoStep(s.push_us, latestServoHomeUs);
+
+      setServoText('dServoHome', homeStep != null ? homeStep.toFixed(0) : '—');
+      setServoText('dServoPush', pushStep != null ? pushStep.toFixed(0) : '—');
       setServoText('dServoSw', s.switch_state !== undefined ? (Number(s.switch_state) === 1 ? 'ON' : 'OFF') : '—');
       setServoText('dServoVolA', s.vol_a_raw ?? '—');
 
-      const input = document.getElementById('servoPushInput');
-      if (input && document.activeElement !== input && s.push_us !== undefined) {
-        input.value = s.push_us;
+      const homeInput = document.getElementById('servoHomeInput');
+      if (homeInput && document.activeElement !== homeInput && homeStep != null) {
+        homeInput.value = homeStep.toFixed(0);
+      }
+
+      const pushInput = document.getElementById('servoPushInput');
+      if (pushInput && document.activeElement !== pushInput && pushStep != null) {
+        pushInput.value = pushStep.toFixed(0);
       }
     });
 
     servoConfigRef.on('value', snap => {
       const c = snap.val();
       if (!c) return;
-      const input = document.getElementById('servoPushInput');
-      if (input && document.activeElement !== input && c.push_us !== undefined) {
-        input.value = c.push_us;
+      const homeInput = document.getElementById('servoHomeInput');
+      if (c.home_us !== undefined) {
+        latestServoHomeUs = Number(c.home_us);
+        updateServoStepInputLimits();
+        const cfgHomeStep = homeUsToStep(latestServoHomeUs);
+        if (homeInput && document.activeElement !== homeInput) {
+          homeInput.value = cfgHomeStep != null ? cfgHomeStep.toFixed(0) : homeInput.value;
+        }
+      }
+
+      const pushInput = document.getElementById('servoPushInput');
+      if (pushInput && document.activeElement !== pushInput && c.push_us !== undefined) {
+        const cfgStep = usToServoStep(c.push_us, latestServoHomeUs);
+        pushInput.value = cfgStep != null ? cfgStep.toFixed(0) : pushInput.value;
       }
     });
+
+    function sendServoHomeUs() {
+      const input = document.getElementById('servoHomeInput');
+      const status = document.getElementById('dServoHomeSetStatus');
+      if (!input) return;
+
+      const stepValue = parseInt(input.value, 10);
+      const homeUsValue = homeStepToUs(stepValue);
+
+      if (isNaN(stepValue) || homeUsValue == null || homeUsValue < 500 || homeUsValue > 2500) {
+        if (status) status.textContent = 'step値が範囲外です';
+        addLog('[SERVO ERR] イニシャル設定値が範囲外: ' + input.value + ' step');
+        return;
+      }
+
+      latestServoHomeUs = homeUsValue;
+
+      servoConfigRef.update({
+        home_us: homeUsValue,
+        home_step: stepValue,
+        updated_at: Date.now(),
+        source: 'web'
+      }).then(() => {
+        if (status) status.textContent = '送信済み: ' + stepValue + ' step (' + homeUsValue + ' us)';
+        addLog('[SERVO] イニシャル設定を送信: ' + stepValue + ' step / ' + homeUsValue + ' us');
+      }).catch(err => {
+        if (status) status.textContent = '送信失敗';
+        addLog('[SERVO ERR] イニシャル設定送信失敗: ' + err.message);
+      });
+    }
 
     function sendServoPushUs() {
       const input = document.getElementById('servoPushInput');
       const status = document.getElementById('dServoPushSetStatus');
       if (!input) return;
 
-      const value = parseInt(input.value, 10);
-      if (isNaN(value) || value < 500 || value > 2500) {
-        if (status) status.textContent = '500〜2500 usで入力';
-        addLog('[SERVO ERR] PUSH_US設定値が範囲外: ' + input.value);
+      const stepValue = parseInt(input.value, 10);
+      const pushUsValue = servoStepToUs(stepValue, latestServoHomeUs);
+
+      if (isNaN(stepValue) || pushUsValue == null || pushUsValue < 500 || pushUsValue > 2500) {
+        if (status) status.textContent = 'step値が範囲外です';
+        addLog('[SERVO ERR] ボタン押し後設定値が範囲外: ' + input.value + ' step');
         return;
       }
 
       servoConfigRef.update({
-        push_us: value,
+        push_us: pushUsValue,
+        push_step: stepValue,
         updated_at: Date.now(),
         source: 'web'
       }).then(() => {
-        if (status) status.textContent = '送信済み: ' + value + ' us';
-        addLog('[SERVO] PUSH_US設定を送信: ' + value + ' us');
+        if (status) status.textContent = '送信済み: ' + stepValue + ' step (' + pushUsValue + ' us)';
+        addLog('[SERVO] ボタン押し後設定を送信: ' + stepValue + ' step / ' + pushUsValue + ' us');
       }).catch(err => {
         if (status) status.textContent = '送信失敗';
-        addLog('[SERVO ERR] PUSH_US設定送信失敗: ' + err.message);
+        addLog('[SERVO ERR] ボタン押し後設定送信失敗: ' + err.message);
       });
     }
 
