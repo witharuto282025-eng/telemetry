@@ -360,6 +360,9 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     /* Alert settings button */
@@ -2037,6 +2040,8 @@
     .conn-status-group {
       display: flex;
       gap: 6px;
+      margin-left: auto;
+      flex-wrap: nowrap;
     }
 
     .conn-chip {
@@ -2102,6 +2107,45 @@
       color: var(--accent);
     }
 
+    .conn-chip.gopro-chip {
+      background: linear-gradient(135deg, #fff3e0, #fce4ec);
+      border-color: #ff6f61;
+      box-shadow: 0 0 0 1px rgba(255, 111, 97, 0.16);
+    }
+
+    .conn-chip.gopro-chip.connected {
+      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+      border-color: #2e7d32;
+    }
+
+    [data-theme="dark"] .conn-chip.gopro-chip {
+      background: linear-gradient(135deg, #2f1a14, #2a1520);
+      border-color: #ff8a65;
+    }
+
+    [data-theme="dark"] .conn-chip.gopro-chip.connected {
+      background: linear-gradient(135deg, #122712, #16250f);
+      border-color: #66bb6a;
+    }
+
+    .conn-chip.gopro-chip .conn-chip-dot {
+      background: #ff6f61;
+      box-shadow: 0 0 6px rgba(255, 111, 97, 0.35);
+    }
+
+    .conn-chip.gopro-chip .conn-chip-dot.ok {
+      background: #2e7d32;
+      box-shadow: 0 0 8px rgba(46, 125, 50, 0.45);
+    }
+
+    .conn-chip.gopro-chip .conn-chip-text {
+      color: #d84315;
+    }
+
+    .conn-chip.gopro-chip.connected .conn-chip-text {
+      color: #2e7d32;
+    }
+
     /* ===== ヘッダータイトル ホバー効果 ===== */
     header h1 .title-main {
       transition: color .2s, opacity .2s;
@@ -2123,6 +2167,90 @@
       text-shadow: 0 0 8px #ff80ab88;
     }
 
+    /* ============================================================
+   ▼ 追記ブロック (v3.4): の直前に貼り付け
+   ①右上 GoPro チップを CAN / SUSP と差別化
+   ②スマホ表示の改善
+   ============================================================ */
+
+/* ---------- ① GoProチップを一目で区別 ---------- */
+/* CAN/SUSP = 緑〜赤のアウトライン系、GoPro = オレンジ＆角丸＆📷 で差別化 */
+  .conn-status-group .conn-chip.gopro-chip {
+  border-radius: 10px;                 /* 角丸を変えて形で区別 */
+  border-width: 2px;
+  padding: 4px 12px 4px 9px;
+  background: #fff;
+  border-color: #ff6f61;
+  box-shadow: 0 2px 6px rgba(255, 111, 97, 0.25);
+}
+.conn-status-group .conn-chip.gopro-chip::before {
+  content: "📷";                        /* 先頭にカメラアイコン */
+  font-size: 12px;
+  line-height: 1;
+  margin-right: 1px;
+}
+.conn-status-group .conn-chip.gopro-chip .conn-chip-label { color: #d84315; }
+.conn-status-group .conn-chip.gopro-chip .conn-chip-dot   { background: #ff6f61; }
+
+/* 接続時は塗りつぶしにして CAN/SUSP(緑) とハッキリ差をつける */
+.conn-status-group .conn-chip.gopro-chip.connected {
+  background: linear-gradient(135deg, #ff7043, #ff9800);
+  border-color: #ff7043;
+  box-shadow: 0 2px 10px rgba(255, 112, 67, 0.45);
+}
+.conn-status-group .conn-chip.gopro-chip.connected .conn-chip-label,
+.conn-status-group .conn-chip.gopro-chip.connected .conn-chip-text { color: #fff; }
+.conn-status-group .conn-chip.gopro-chip.connected .conn-chip-dot.ok {
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
+}
+
+/* ダークモード用 */
+[data-theme="dark"] .conn-status-group .conn-chip.gopro-chip {
+  background: #2a1712;
+  border-color: #ff8a65;
+}
+[data-theme="dark"] .conn-status-group .conn-chip.gopro-chip.connected {
+  background: linear-gradient(135deg, #ff7043, #f57c00);
+  border-color: #ff8a65;
+}
+
+/* ---------- ② スマホ表示の改善 ---------- */
+@media screen and (max-width: 900px) {
+  /* ヘッダー要素が重ならないよう折り返し */
+  header { flex-wrap: wrap; row-gap: 6px; }
+  .header-right {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+    row-gap: 8px;
+  }
+
+  /* 接続チップ(CAN/SUSP/GoPro)がはみ出さないよう折り返して均等配置 */
+  .conn-status-group {
+    flex-wrap: wrap;          /* ← 元は nowrap ではみ出していた */
+    width: 100%;
+    margin-left: 0;
+    gap: 6px;
+  }
+  .conn-status-group .conn-chip {
+    flex: 1 1 auto;
+    min-width: 92px;
+    justify-content: center;
+    padding: 5px 8px;
+  }
+
+  /* 記録コントロールも折り返して押しやすく */
+  .rec-controls { flex-wrap: wrap; gap: 6px; }
+}
+
+@media screen and (max-width: 480px) {
+  /* 極小画面ではチップを1行1個で見やすく */
+  .conn-status-group .conn-chip { flex: 1 1 100%; }
+  .rec-controls { justify-content: center; }
+  .header-right { gap: 6px; }
+}
+
   </style>
 </head>
 
@@ -2130,7 +2258,7 @@
 
   <!-- HEADER -->
   <header>
-    <h1><span class="title-main">テレメトリー</span><span class="title-hover">たけちゃんセンサー💘</span><span class="version-link" onclick="openVersionModal()" title="バージョン情報・更新履歴">v3.3</span></h1>
+    <h1><span class="title-main">テレメトリー</span><span class="title-hover">たけちゃんセンサー💘</span><span class="version-link" onclick="openVersionModal()" title="バージョン情報・更新履歴">v3.4</span></h1>
     <div class="header-right">
       <!-- Recording Controls -->
       <div class="rec-controls">
@@ -2161,6 +2289,11 @@
           <div class="conn-chip-dot" id="connDotSusp"></div>
           <span class="conn-chip-label">SUSP</span>
           <span class="conn-chip-text" id="connTextSusp">未接続</span>
+        </div>
+        <div class="conn-chip gopro-chip" id="connChipGopro">
+          <div class="conn-chip-dot" id="connDotGopro"></div>
+          <span class="conn-chip-label">GoPro</span>
+          <span class="conn-chip-text" id="connTextGopro">未接続</span>
         </div>
       </div>
     </div>
@@ -3025,7 +3158,8 @@
     }
 
     function updateGoProPanel(d) {
-      const connected = d.gopro_connected === '1' || d.gopro_connected === 1;
+      const canConnected = typeof isConnected === 'boolean' ? isConnected : true;
+      const connected = canConnected && (d.gopro_connected === '1' || d.gopro_connected === 1);
       const recording = d.gopro_recording === '1' || d.gopro_recording === 1;
       goproState.connected = connected;
       goproState.recording = recording;
@@ -3050,6 +3184,20 @@
       } else {
         connDot.className = 'gopro-status-dot off';
         connVal.textContent = '未接続';
+      }
+
+      // --- ヘッダー右上の接続チップ (GoPro) ---
+      const chipGopro = document.getElementById('connChipGopro');
+      const chipDotGopro = document.getElementById('connDotGopro');
+      const chipTextGopro = document.getElementById('connTextGopro');
+      if (connected) {
+        chipDotGopro.classList.add('ok');
+        chipGopro.classList.add('connected');
+        chipTextGopro.textContent = recording ? '録画中' : '接続中';
+      } else {
+        chipDotGopro.classList.remove('ok');
+        chipGopro.classList.remove('connected');
+        chipTextGopro.textContent = '未接続';
       }
 
       // --- バッテリ --- (gopro_battery_pct: -1=BLE未取得, 0-100)
@@ -3393,6 +3541,13 @@
       document.getElementById('connDotCan').classList.remove('ok');
       document.getElementById('connTextCan').textContent = '途絶';
       document.getElementById('connChipCan').classList.remove('connected');
+      document.getElementById('connDotGopro').classList.remove('ok');
+      document.getElementById('connChipGopro').classList.remove('connected');
+      document.getElementById('connTextGopro').textContent = '未接続';
+      document.getElementById('goproPowerDot').className = 'gopro-status-dot off';
+      document.getElementById('goproPowerVal').textContent = 'OFF';
+      document.getElementById('goproConnDot').className = 'gopro-status-dot off';
+      document.getElementById('goproConnVal').textContent = '未接続';
       document.getElementById('infoState').textContent = '切断';
       document.getElementById('infoFreq').textContent = '0 Hz';
       // インジケータも切断状態にする
@@ -3571,6 +3726,13 @@
       document.getElementById('connDotCan').classList.remove('ok');
       document.getElementById('connTextCan').textContent = '未接続';
       document.getElementById('connChipCan').classList.remove('connected');
+      document.getElementById('connDotGopro').classList.remove('ok');
+      document.getElementById('connChipGopro').classList.remove('connected');
+      document.getElementById('connTextGopro').textContent = '未接続';
+      document.getElementById('goproPowerDot').className = 'gopro-status-dot off';
+      document.getElementById('goproPowerVal').textContent = 'OFF';
+      document.getElementById('goproConnDot').className = 'gopro-status-dot off';
+      document.getElementById('goproConnVal').textContent = '未接続';
       document.getElementById('infoState').textContent = '切断';
     });
 
