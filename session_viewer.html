@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>セッション詳細 - テレメトリー</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- ★ Firebase SDK 追加 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     .js"></script>
     <style>
@@ -16,21 +15,49 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #f5f5f5;
+            --panel: #ffffff;
+            --border: #e0e0e0;
+            --text: #212121;
+            --dim: #888;
+            --card: #f0f0f0;
+            --accent: #2e7d32;
+            --grid: #eee;
+            --tick: #999;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0d1117;
+            --panel: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --dim: #8b949e;
+            --card: #21262d;
+            --accent: #4caf50;
+            --grid: #30363d;
+            --tick: #8b949e;
+        }
+
         body {
             font-family: 'Noto Sans JP', 'Segoe UI', sans-serif;
-            background: #0d1117;
-            color: #e6edf3;
-            padding: 16px;
+            background: var(--bg);
+            color: var(--text);
             font-size: 13px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #30363d;
-            margin-bottom: 16px;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel);
+            flex-shrink: 0;
         }
 
         h1 {
@@ -39,43 +66,44 @@
         }
 
         h1 span {
-            color: #4caf50;
+            color: var(--accent);
             font-size: 12px;
             margin-left: 8px;
         }
 
-        .back-btn {
-            background: #21262d;
-            color: #e6edf3;
-            border: 1px solid #30363d;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
+        .btns {
+            display: flex;
+            gap: 8px;
         }
 
-        .back-btn:hover {
-            background: #30363d;
+        .btns button {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .btns button:hover {
+            opacity: .8;
         }
 
         .meta-bar {
             display: flex;
             flex-wrap: wrap;
             gap: 16px;
-            padding: 12px 16px;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-
-        .meta-item {
-            font-size: 12px;
+            padding: 8px 16px;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
         .meta-item .lbl {
-            color: #8b949e;
+            color: var(--dim);
             font-size: 10px;
             text-transform: uppercase;
             display: block;
@@ -87,35 +115,116 @@
             font-family: 'Courier New', monospace;
         }
 
+        /* ===== メインレイアウト：左サイドバー + 右コンテンツ ===== */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ch-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 2px;
+            transition: background .15s;
+        }
+
+        .ch-item:hover {
+            background: var(--card);
+        }
+
+        .ch-item input {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .ch-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .ch-name {
+            flex: 1;
+            font-size: 12px;
+        }
+
+        .ch-unit {
+            font-size: 10px;
+            color: var(--dim);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .chart-box {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            height: 420px;
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
-            background: #161b22;
-            border: 1px solid #30363d;
+            background: var(--panel);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 10px 12px;
+            padding: 8px 10px;
         }
 
         .stat-card .name {
-            color: #8b949e;
+            color: var(--dim);
             font-size: 11px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
+            font-weight: 600;
         }
 
         .stat-card .row {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             padding: 1px 0;
         }
 
         .stat-card .row .k {
-            color: #8b949e;
+            color: var(--dim);
         }
 
         .stat-card .row .v {
@@ -123,57 +232,26 @@
             font-weight: 700;
         }
 
-        .chart-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .chart-controls select {
-            background: #21262d;
-            color: #e6edf3;
-            border: 1px solid #30363d;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .chart-box {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
-            height: 340px;
-        }
-
         .empty {
             text-align: center;
             padding: 60px 20px;
-            color: #8b949e;
+            color: var(--dim);
             font-size: 15px;
         }
 
-        .dl-btns {
-            display: flex;
-            gap: 8px;
+        .hint {
+            font-size: 11px;
+            color: var(--dim);
+            margin-bottom: 8px;
         }
 
-        .dl-btns button {
-            background: #21262d;
-            color: #e6edf3;
-            border: 1px solid #30363d;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .dl-btns button:hover {
-            background: #30363d;
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -181,24 +259,54 @@
 <body>
     <header>
         <h1>セッション詳細 <span id="sessName"></span></h1>
-        <div class="dl-btns">
+        <div class="btns">
+            <button id="themeBtn" onclick="toggleTheme()">🌙</button>
             <button onclick="dlCSV()">CSV</button>
             <button onclick="dlJSON()">JSON</button>
-            <button class="back-btn" onclick="window.close()">✕ 閉じる</button>
+            <button onclick="window.close()">✕ 閉じる</button>
         </div>
     </header>
 
-    <div id="content">
-        <div class="meta-bar" id="metaBar"></div>
-        <div class="stats-grid" id="statsGrid"></div>
-        <div class="chart-controls">
-            <label style="color:#8b949e;">グラフ項目:</label>
-            <select id="chartSelect"></select>
+    <div class="meta-bar" id="metaBar"></div>
+
+    <div class="main">
+        <!-- 左：チャンネル選択 -->
+        <div class="sidebar">
+            <div class="sidebar-title">表示チャンネル</div>
+            <div class="hint">チェックした項目を右に重ねて表示</div>
+            <div id="channelList"></div>
         </div>
-        <div class="chart-box"><canvas id="mainChart"></canvas></div>
+        <!-- 右：グラフ + 統計 -->
+        <div class="content" id="content">
+            <div class="chart-box"><canvas id="mainChart"></canvas></div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
     </div>
 
     <script>
+        // ========== テーマ ==========
+        (function initTheme() {
+            const saved = localStorage.getItem('telemetry-theme');
+            if (saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeBtn').textContent = '☀️';
+            }
+        })();
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                html.removeAttribute('data-theme');
+                document.getElementById('themeBtn').textContent = '🌙';
+                localStorage.setItem('telemetry-theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                document.getElementById('themeBtn').textContent = '☀️';
+                localStorage.setItem('telemetry-theme', 'dark');
+            }
+            if (data) drawChart();   // グラフの色を再描画
+        }
+
         // ========== Firebase 初期化 ==========
         const firebaseConfig = {
             apiKey: "AIzaSyDf7A3PnHBnx3z6T4sq_44jdq1Ys7CdGnE",
@@ -212,56 +320,47 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // ========== チャンネル定義（色付き） ==========
         const FIELDS = [
-            { key: 'rpm', label: 'RPM', unit: '' },
-            { key: 'tps', label: 'TPS', unit: '%' },
-            { key: 'kph', label: '車速', unit: 'km/h' },
-            { key: 'water_temp', label: '水温', unit: '°C' },
-            { key: 'air_temp', label: '吸気温', unit: '°C' },
-            { key: 'map_kpa', label: 'MAP', unit: 'kPa' },
-            { key: 'lambda', label: 'Lambda', unit: '' },
-            { key: 'oil_p', label: '油圧', unit: 'kPa' },
-            { key: 'oil_temp', label: '油温', unit: '°C' },
-            { key: 'fuel_p', label: '燃圧', unit: 'kPa' },
-            { key: 'volts', label: '電圧', unit: 'V' },
-            { key: 'injection_ms', label: '噴射時間', unit: 'ms' },
-            { key: 'calc_fuel_gs', label: '燃料', unit: 'g/s' },
-            { key: 'calc_fuel_lph', label: '燃料', unit: 'L/h' },
-            { key: 'total_fuel_l', label: '総燃料', unit: 'L' },
-            { key: 'crank_errors', label: 'CRKエラー', unit: '' },
-            { key: 'cam_errors', label: 'CAMエラー', unit: '' },
+            { key: 'rpm', label: 'RPM', unit: '', color: '#e65100' },
+            { key: 'kph', label: '車速', unit: 'km/h', color: '#1565c0' },
+            { key: 'tps', label: 'TPS', unit: '%', color: '#2e7d32' },
+            { key: 'gear', label: 'ギア', unit: '', color: '#6a1b9a' },
+            { key: 'water_temp', label: '水温', unit: '°C', color: '#00838f' },
+            { key: 'air_temp', label: '吸気温', unit: '°C', color: '#00acc1' },
+            { key: 'oil_temp', label: '油温', unit: '°C', color: '#ad1457' },
+            { key: 'oil_p', label: '油圧', unit: 'kPa', color: '#4527a0' },
+            { key: 'fuel_p', label: '燃圧', unit: 'kPa', color: '#283593' },
+            { key: 'map_kpa', label: 'MAP', unit: 'kPa', color: '#7b1fa2' },
+            { key: 'lambda', label: 'Lambda', unit: '', color: '#f9a825' },
+            { key: 'volts', label: '電圧', unit: 'V', color: '#c62828' },
+            { key: 'injection_ms', label: '噴射時間', unit: 'ms', color: '#00695c' },
+            { key: 'calc_fuel_gs', label: '燃料', unit: 'g/s', color: '#ef6c00' },
+            { key: 'calc_fuel_lph', label: '燃料', unit: 'L/h', color: '#5d4037' },
+            { key: 'total_fuel_l', label: '総燃料', unit: 'L', color: '#455a64' },
+            { key: 'crank_errors', label: 'CRKエラー', unit: '', color: '#d32f2f' },
+            { key: 'cam_errors', label: 'CAMエラー', unit: '', color: '#f44336' },
         ];
 
-        // ========== URLパラメータからID取得 ==========
         const id = new URLSearchParams(location.search).get('id');
-
         let meta = null, data = null;
+        let selected = new Set(['rpm']);   // 初期選択
 
-        // ========== ★ Firebaseから読み込み ==========
         if (!id) {
             showEmpty('セッションIDが指定されていません');
         } else {
             db.ref('sessions/' + id).once('value').then(snap => {
                 const s = snap.val();
-                if (!s || !s.meta || !s.data) {
-                    showEmpty('セッションデータが見つかりませんでした');
-                    return;
-                }
+                if (!s || !s.meta || !s.data) { showEmpty('セッションデータが見つかりませんでした'); return; }
                 meta = s.meta;
-                data = JSON.parse(s.data);   // JSON文字列を配列に戻す
-                if (!data || data.length === 0) {
-                    showEmpty('データが空です');
-                    return;
-                }
+                data = JSON.parse(s.data);
+                if (!data || data.length === 0) { showEmpty('データが空です'); return; }
                 renderAll();
-            }).catch(err => {
-                showEmpty('読み込み失敗: ' + err.message);
-            });
+            }).catch(err => showEmpty('読み込み失敗: ' + err.message));
         }
 
         function showEmpty(msg) {
-            document.getElementById('content').innerHTML =
-                '<div class="empty">' + msg + '</div>';
+            document.querySelector('.main').innerHTML = '<div class="empty">' + msg + '</div>';
         }
 
         // ========== 描画 ==========
@@ -278,9 +377,46 @@
         ${meta.memo ? `<div class="meta-item"><span class="lbl">メモ</span><span class="val">${escapeHtml(meta.memo)}</span></div>` : ''}
       `;
 
+            // 左サイドバー：チャンネル選択リスト
+            const list = document.getElementById('channelList');
+            list.innerHTML = '';
+            FIELDS.forEach(f => {
+                const vals = data.map(p => parseFloat(p[f.key])).filter(v => !isNaN(v));
+                if (vals.length === 0) return;   // データが無い項目は非表示
+                const div = document.createElement('div');
+                div.className = 'ch-item';
+                div.innerHTML = `
+          <input type="checkbox" data-key="${f.key}" ${selected.has(f.key) ? 'checked' : ''}>
+          <span class="ch-color" style="background:${f.color}"></span>
+          <span class="ch-name">${f.label}</span>
+          <span class="ch-unit">${f.unit}</span>
+        `;
+                div.querySelector('input').addEventListener('change', e => {
+                    if (e.target.checked) selected.add(f.key);
+                    else selected.delete(f.key);
+                    drawChart();
+                    renderStats();
+                });
+                // 行クリックでもトグル
+                div.addEventListener('click', e => {
+                    if (e.target.tagName !== 'INPUT') {
+                        const chk = div.querySelector('input');
+                        chk.checked = !chk.checked;
+                        chk.dispatchEvent(new Event('change'));
+                    }
+                });
+                list.appendChild(div);
+            });
+
+            drawChart();
+            renderStats();
+        }
+
+        // 統計カード（選択中のみ）
+        function renderStats() {
             const grid = document.getElementById('statsGrid');
             grid.innerHTML = '';
-            FIELDS.forEach(f => {
+            FIELDS.filter(f => selected.has(f.key)).forEach(f => {
                 const vals = data.map(p => parseFloat(p[f.key])).filter(v => !isNaN(v));
                 if (vals.length === 0) return;
                 const min = Math.min(...vals), max = Math.max(...vals);
@@ -288,52 +424,42 @@
                 const card = document.createElement('div');
                 card.className = 'stat-card';
                 card.innerHTML = `
-          <div class="name">${f.label}${f.unit ? ' (' + f.unit + ')' : ''}</div>
+          <div class="name"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${f.color};margin-right:5px;"></span>${f.label}${f.unit ? ' (' + f.unit + ')' : ''}</div>
           <div class="row"><span class="k">最小</span><span class="v">${fmt(min)}</span></div>
           <div class="row"><span class="k">最大</span><span class="v">${fmt(max)}</span></div>
           <div class="row"><span class="k">平均</span><span class="v">${fmt(avg)}</span></div>
         `;
                 grid.appendChild(card);
             });
-
-            const sel = document.getElementById('chartSelect');
-            sel.innerHTML = '';
-            FIELDS.forEach(f => {
-                const o = document.createElement('option');
-                o.value = f.key;
-                o.textContent = f.label + (f.unit ? ' (' + f.unit + ')' : '');
-                sel.appendChild(o);
-            });
-            sel.value = 'rpm';
-            sel.addEventListener('change', drawChart);
-            drawChart();
         }
 
         let chart = null;
         function drawChart() {
-            const key = document.getElementById('chartSelect').value;
-            const field = FIELDS.find(f => f.key === key);
             const t0 = data[0].ts;
             const labels = data.map(p => ((p.ts - t0) / 1000).toFixed(0) + 's');
-            const vals = data.map(p => parseFloat(p[key]) || 0);
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid').trim();
+            const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--tick').trim();
+
+            const datasets = FIELDS.filter(f => selected.has(f.key)).map(f => ({
+                label: f.label + (f.unit ? ' (' + f.unit + ')' : ''),
+                data: data.map(p => parseFloat(p[f.key]) || 0),
+                borderColor: f.color,
+                backgroundColor: f.color + '22',
+                borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false
+            }));
+
             if (chart) chart.destroy();
             chart = new Chart(document.getElementById('mainChart').getContext('2d'), {
                 type: 'line',
-                data: {
-                    labels, datasets: [{
-                        label: field.label + (field.unit ? ' (' + field.unit + ')' : ''),
-                        data: vals, borderColor: '#4caf50',
-                        backgroundColor: 'rgba(76,175,80,0.1)',
-                        borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: true
-                    }]
-                },
+                data: { labels, datasets },
                 options: {
                     responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
-                        x: { grid: { color: '#30363d' }, ticks: { color: '#8b949e', maxTicksLimit: 12, font: { size: 10 } } },
-                        y: { grid: { color: '#30363d' }, ticks: { color: '#8b949e', font: { size: 10 } } }
+                        x: { grid: { color: gridColor }, ticks: { color: tickColor, maxTicksLimit: 14, font: { size: 10 } } },
+                        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
                     },
-                    plugins: { legend: { labels: { color: '#e6edf3' } } }
+                    plugins: { legend: { labels: { color: tickColor, font: { size: 11 } } } }
                 }
             });
         }
