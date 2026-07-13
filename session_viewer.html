@@ -348,7 +348,7 @@
             const headers = ['Timestamp', 'Time', ...FIELDS.map(f => f.label + (f.unit ? '(' + f.unit + ')' : ''))];
             const rows = data.map(p => {
                 const t = new Date(p.ts).toLocaleTimeString('ja-JP', { hour12: false });
-                return [p.ts, t, ...keys.map(k => p[k] !== undefined ? p'')];
+                return [p.ts, t, ...keys.map(k => p[k] !== undefined ? p[k] : '')];
             });
             const csv = '\uFEFF' + [
                 headers.map(h => '"' + h + '"').join(','),
