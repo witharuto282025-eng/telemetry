@@ -4130,26 +4130,7 @@
             });
         }
 
-        // メタデータ保存
-        const allMeta = getSessionsMeta();
-        allMeta.unshift(meta); // 新しい順に先頭に追加
-        try {
-            localStorage.setItem(SESSION_META_KEY, JSON.stringify(allMeta));
-            localStorage.setItem(SESSION_DATA_PREFIX + sessionId, JSON.stringify(recDataPoints));
-            addLog('[SAVE] セッション「' + name + '」を保存');
-        } catch (e) {
-            if (e.name === 'QuotaExceededError') {
-                alert('ストレージ容量不足です。走行履歴から古いセッションを削除してください。');
-                addLog('[ERR] 保存失敗: ストレージ容量不足');
-            } else {
-                alert('保存に失敗しました: ' + e.message);
-            }
-            return;
-        }
 
-        recDataPoints = [];
-        closeSaveModal();
-    }
 
         function discardRecording() {
             if (!confirm('記録データを破棄しますか？')) return;
@@ -4248,33 +4229,7 @@
             });
         }
 
-        if (meta.length === 0) {
-            container.innerHTML = '<div class="session-empty">記録された走行セッションはありません</div>';
-            return;
-        }
 
-        let html = '<ul class="session-list">';
-        meta.forEach((s, i) => {
-            const date = new Date(s.startTime).toLocaleString('ja-JP', { hour12: false });
-            const dur = Math.floor(s.duration / 60000) + '分' + Math.floor((s.duration % 60000) / 1000) + '秒';
-            const modeLabel = s.mode === 'auto' ? '自動' : '手動';
-            html += `
-          <li class="session-item">
-            <div class="session-info">
-              <div class="session-name">${escapeHtml(s.name)}</div>
-              <div class="session-meta">${date} ｜ ${dur} ｜ ${s.pointCount}pt ｜ ${modeLabel}${s.memo ? ' ｜ ' + escapeHtml(s.memo) : ''}</div>
-            </div>
-            <div class="session-actions">
-              <button class="session-action-btn" onclick="viewSession('${s.id}')" title="詳細を見る">閲覧</button>
-              <button class="session-action-btn" onclick="downloadSessionCSV('${s.id}')" title="CSVダウンロード">CSV</button>
-              <button class="session-action-btn" onclick="downloadSessionJSON('${s.id}')" title="JSONダウンロード">JSON</button>
-              <button class="session-action-btn delete" onclick="deleteSession('${s.id}', ${i})" title="削除">削除</button>
-            </div>
-          </li>`;
-        });
-        html += '</ul>';
-        container.innerHTML = html;
-    }
 
         function escapeHtml(str) {
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
