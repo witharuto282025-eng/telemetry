@@ -2502,8 +2502,12 @@
                     <td id="infoMethod">Firebase RTDB</td>
                 </tr>
                 <tr>
-                    <td>更新頻度</td>
+                    <td>CAN更新頻度</td>
                     <td id="infoFreq">— Hz</td>
+                </tr>
+                <tr>
+                    <td>サス更新頻度</td>
+                    <td id="infoSuspFreq">— Hz</td>
                 </tr>
                 <tr>
                     <td>最終受信</td>
@@ -3470,20 +3474,80 @@
 
         updateServoStepInputLimits();
 
+        // ========== Active Suspension connection monitor ==========
+        const SUSP_INITIAL_CHECK_MS = 2000;
+        const SUSP_DATA_TIMEOUT_MS = 5000;
+
+        let isSuspConnected = false;
+        let suspLastUptime = null;
+        let suspUptimeChanged = false;
+        let suspLastUpdateTime = 0;
+        let suspUpdateCount = 0;
+        let suspTimeoutReported = false;
+
+        function setSuspConnected() {
+            if (!isSuspConnected) {
+                addLog('[CONN] Active Suspension ESP 接続正常');
+            }
+
+            isSuspConnected = true;
+            suspTimeoutReported = false;
+
+            const dot = document.getElementById('connDotSusp');
+            const text = document.getElementById('connTextSusp');
+            const chip = document.getElementById('connChipSusp');
+
+            if (dot) dot.classList.add('ok');
+            if (text) text.textContent = '接続中';
+            if (chip) chip.classList.add('connected');
+        }
+
+        function setSuspDisconnected(reason = '途絶', logMessage = null) {
+            const wasConnected = isSuspConnected;
+            isSuspConnected = false;
+
+            const dot = document.getElementById('connDotSusp');
+            const text = document.getElementById('connTextSusp');
+            const chip = document.getElementById('connChipSusp');
+            const freq = document.getElementById('infoSuspFreq');
+
+            if (dot) dot.classList.remove('ok');
+            if (text) text.textContent = reason;
+            if (chip) chip.classList.remove('connected');
+            if (freq) freq.textContent = '0 Hz';
+
+            if (logMessage && (wasConnected || !suspTimeoutReported)) {
+                addLog(logMessage);
+            }
+        }
+
         // ========== Servo ESP32 Listener ==========
         servoRef.on('value', snap => {
             const s = snap.val();
             if (!s) return;
 
-            // Suspension ESP 接続状態更新
-            if (!isSuspConnected) {
-                addLog('[CONN] Suspension ESP データ受信開始');
+            // Firebaseに残っている初回値だけでは接続正常と判定しません。
+            // test_uptimeが前回値から変化した場合のみ、通信経路が動作中と判定します。
+            if (s.test_uptime !== undefined && s.test_uptime !== null) {
+                const receivedUptime = Number(s.test_uptime);
+
+                if (Number.isFinite(receivedUptime)) {
+                    if (suspLastUptime === null) {
+                        suspLastUptime = receivedUptime;
+                        const text = document.getElementById('connTextSusp');
+                        if (text) text.textContent = '確認中…';
+                        addLog('[SUSP] test_uptime初期値を受信: ' + receivedUptime);
+                    } else if (receivedUptime !== suspLastUptime) {
+                        // ESP32再起動やmillis()のオーバーフローで値が小さくなっても、
+                        // 前回値と異なれば有効な更新として扱います。
+                        suspLastUptime = receivedUptime;
+                        suspUptimeChanged = true;
+                        suspLastUpdateTime = Date.now();
+                        suspUpdateCount++;
+                        setSuspConnected();
+                    }
+                }
             }
-            isSuspConnected = true;
-            document.getElementById('connDotSusp').classList.add('ok');
-            document.getElementById('connTextSusp').textContent = '接続中';
-            document.getElementById('connChipSusp').classList.add('connected');
-            resetSuspDataTimeout();
 
             const setServoText = (id, value) => {
                 const el = document.getElementById(id);
@@ -3513,6 +3577,42 @@
                 pushInput.value = pushStep.toFixed(0);
             }
         });
+
+        // ページ表示後2秒以内にtest_uptimeが変化しなければ、古いデータと判定します。
+        setTimeout(() => {
+            if (!suspUptimeChanged) {
+                suspTimeoutReported = true;
+                setSuspDisconnected(
+                    '古いデータ',
+                    '[SUSP TIMEOUT] ページ表示後2秒以内にtest_uptimeが変化しませんでした'
+                );
+            }
+        }, SUSP_INITIAL_CHECK_MS);
+
+        // 最後の有効更新から5秒経過した場合、接続途絶と判定します。
+        setInterval(() => {
+            if (!suspUptimeChanged || suspLastUpdateTime === 0) return;
+
+            const elapsed = Date.now() - suspLastUpdateTime;
+            if (elapsed >= SUSP_DATA_TIMEOUT_MS) {
+                if (!suspTimeoutReported) {
+                    suspTimeoutReported = true;
+                    setSuspDisconnected(
+                        '途絶',
+                        '[SUSP TIMEOUT] test_uptimeが5秒間更新されませんでした'
+                    );
+                } else {
+                    setSuspDisconnected('途絶');
+                }
+            }
+        }, 250);
+
+        // 1秒間にtest_uptimeが変化した回数を更新頻度として表示します。
+        setInterval(() => {
+            const freq = document.getElementById('infoSuspFreq');
+            if (freq) freq.textContent = suspUpdateCount + ' Hz';
+            suspUpdateCount = 0;
+        }, 1000);
 
         servoConfigRef.on('value', snap => {
             const c = snap.val();
@@ -3599,9 +3699,6 @@
         }, 1000);
 
         // ========== タイムアウトで切断表示にする ==========
-        let isSuspConnected = false;
-        let suspDataTimeoutTimer = null;
-
         function setDisconnected() {
             isConnected = false;
             document.getElementById('connDotCan').classList.remove('ok');
@@ -3621,23 +3718,10 @@
             addLog('[TIMEOUT] CAN ESP データタイムアウト — ' + DATA_TIMEOUT_MS / 1000 + '秒間データ受信なし');
         }
 
-        function setSuspDisconnected() {
-            isSuspConnected = false;
-            document.getElementById('connDotSusp').classList.remove('ok');
-            document.getElementById('connTextSusp').textContent = '途絶';
-            document.getElementById('connChipSusp').classList.remove('connected');
-            addLog('[TIMEOUT] Suspension ESP データタイムアウト');
-        }
-
-        // データ受信タイマーをリセットする
+        // CAN ESPのデータ受信タイマーをリセットします。
         function resetDataTimeout() {
             if (dataTimeoutTimer) clearTimeout(dataTimeoutTimer);
             dataTimeoutTimer = setTimeout(setDisconnected, DATA_TIMEOUT_MS);
-        }
-
-        function resetSuspDataTimeout() {
-            if (suspDataTimeoutTimer) clearTimeout(suspDataTimeoutTimer);
-            suspDataTimeoutTimer = setTimeout(setSuspDisconnected, DATA_TIMEOUT_MS);
         }
 
         // ========== Error highlighting ==========
