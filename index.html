@@ -2999,6 +2999,7 @@
             });
         }
 
+
         function saveAlertToStorage() {
             // Firebase RTDB に保存（全ユーザー共有）
             try {
@@ -3105,6 +3106,16 @@
 
         // 初期ロード
         loadAlertSettings();
+
+        // ★ 燃料リセット基準値を全端末で同期
+        db.ref('settings/fuel_reset').on('value', snap => {
+            const v = snap.val();
+            if (v) {
+                fuelResetBaseline = parseFloat(v.baseline);
+                fuelResetTime = parseInt(v.time);
+                if (latestData) updateResetFuelDisplay(latestData.total_fuel_l);
+            }
+        });
 
         // モーダル背景クリックで閉じる
         document.getElementById('alertModal').addEventListener('click', function (e) {
@@ -3941,16 +3952,16 @@
             }
         }
 
+        const fuelResetRef = db.ref('settings/fuel_reset');   // ★ 追加（他のref定義の近くでも可）
+
         function resetFuelCounter() {
             const cur = latestData ? parseFloat(latestData.total_fuel_l) : 0;
-            fuelResetBaseline = isNaN(cur) ? 0 : cur;
-            fuelResetTime = Date.now();
-            localStorage.setItem(FUEL_RESET_KEY, String(fuelResetBaseline));
-            localStorage.setItem(FUEL_RESET_TIME_KEY, String(fuelResetTime));
-            updateResetFuelDisplay(cur);
-            addLog('[FUEL] 燃料消費カウンタをリセット (基準値: ' + fuelResetBaseline.toFixed(3) + ' L)');
+            const baseline = isNaN(cur) ? 0 : cur;
+            // ★ Firebaseに保存（全端末共有）
+            fuelResetRef.set({ baseline: baseline, time: Date.now() })
+                .then(() => addLog('[FUEL] 燃料カウンタをリセット (基準: ' + baseline.toFixed(3) + ' L)'))
+                .catch(err => addLog('[FUEL ERR] ' + err.message));
         }
-
         // ========== SESSION RECORDING SYSTEM ==========
         const SESSION_META_KEY = 'ofrac-telemetry-sessions-meta';
         const SESSION_DATA_PREFIX = 'ofrac-telemetry-session-';
