@@ -3696,13 +3696,30 @@
             resetDataTimeout();
 
             // Connection status (CAN ESP)
+            // ★ test_uptime の変化で「生きている」かを判定
             const wasDisconnected = !isConnected;
-            isConnected = true;
-            document.getElementById('connDotCan').classList.add('ok');
-            document.getElementById('connTextCan').textContent = '接続中';
-            document.getElementById('connChipCan').classList.add('connected');
-            document.getElementById('infoState').textContent = '接続';
-            document.getElementById('infoLast').textContent = timeLabel;
+            const curUptime = parseInt(d.test_uptime);
+            if (window._lastUptime === undefined) {
+                // 初回スナップショット：まだ生死不明。2秒以内に変化するか監視
+                window._lastUptime = curUptime;
+                window._uptimeCheckDone = false;
+                clearTimeout(window._freshProbe);
+                window._freshProbe = setTimeout(() => {
+                    // 2秒経っても uptime が変わっていなければ「古い値」=途絶
+                    if (!window._uptimeCheckDone) setDisconnected();
+                }, 2000);
+                // 初回は「確認中」表示
+                document.getElementById('connTextCan').textContent = '確認中…';
+            } else if (curUptime !== window._lastUptime) {
+                // uptime が進んだ = リアルタイムに受信中
+                window._lastUptime = curUptime;
+                window._uptimeCheckDone = true;
+                isConnected = true;
+                document.getElementById('connDotCan').classList.add('ok');
+                document.getElementById('connTextCan').textContent = '接続中';
+                document.getElementById('connChipCan').classList.add('connected');
+                document.getElementById('infoState').textContent = '接続';
+            }
 
             // 切断状態から復帰した場合ログに記録
             if (wasDisconnected) {
