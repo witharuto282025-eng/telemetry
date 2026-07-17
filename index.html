@@ -2297,14 +2297,13 @@
             }
         }
     </style>
-</head>
 
 <body>
 
     <!-- HEADER -->
     <header>
         <h1><span class="title-main">テレメトリー</span><span class="title-hover">たけちゃんセンサー💘</span><span class="version-link"
-                onclick="openVersionModal()" title="バージョン情報・更新履歴">v3.4</span></h1>
+                onclick="openVersionModal()" title="バージョン情報・更新履歴">v3.5</span></h1>
         <div class="header-right">
             <!-- Recording Controls -->
             <div class="rec-controls">
@@ -2439,6 +2438,14 @@
             </div>
             <div class="modal-body">
                 <div class="version-history">
+                    <h3>v3.5 — 2026/07/17</h3>
+                    <ul>
+                        <li>点火時期（Advance）のデータカード・グラフ追加</li>
+                        <li>セッションCSV/JSONダウンロードをFirebase対応に修正</li>
+                        <li>GoPro自動モード時のボタン無効化ロジック修正</li>
+                        <li>ダークモードでのチャート初回描画色修正</li>
+                        <li>HTML構造の不具合修正（headタグ重複）</li>
+                    </ul>
                     <h3>v3.3 — 2026/07/03</h3>
                     <ul>
                         <li>左サイドバーのレイアウト最適化（スクロール不要に）</li>
@@ -2566,6 +2573,11 @@
                     <div class="label">噴射時間</div>
                     <div class="value" id="dInj">—</div>
                     <div class="unit">ms</div>
+                </div>
+                <div class="data-card" id="card_advance">
+                    <div class="label">点火時期</div>
+                    <div class="value" id="dAdvance">—</div>
+                    <div class="unit">°</div>
                 </div>
                 <div class="data-card full" id="card_totalfuel">
                     <div class="label">総燃料消費</div>
@@ -2759,6 +2771,7 @@
                                 <option value="injection_ms">噴射時間 (ms)</option>
                                 <option value="calc_fuel_gs">燃料 (g/s)</option>
                                 <option value="calc_fuel_lph">燃料 (L/h)</option>
+                                <option value="advance">点火時期 (°)</option>
                             </select>
                         </div>
                         <div class="chart-wrap"><canvas id="chart1"></canvas></div>
@@ -2782,6 +2795,7 @@
                                 <option value="injection_ms">噴射時間 (ms)</option>
                                 <option value="calc_fuel_gs">燃料 (g/s)</option>
                                 <option value="calc_fuel_lph">燃料 (L/h)</option>
+                                <option value="advance">点火時期 (°)</option>
                             </select>
                         </div>
                         <div class="chart-wrap"><canvas id="chart2"></canvas></div>
@@ -2805,6 +2819,7 @@
                                 <option value="injection_ms">噴射時間 (ms)</option>
                                 <option value="calc_fuel_gs">燃料 (g/s)</option>
                                 <option value="calc_fuel_lph">燃料 (L/h)</option>
+                                <option value="advance">点火時期 (°)</option>
                             </select>
                         </div>
                         <div class="chart-wrap"><canvas id="chart3"></canvas></div>
@@ -2945,7 +2960,7 @@
         const history = {};
         const DATA_KEYS = ['rpm', 'tps', 'kph', 'gear', 'water_temp', 'air_temp', 'map_kpa', 'lambda',
             'oil_p', 'oil_temp', 'fuel_p', 'volts', 'crank_errors', 'cam_errors', 'injection_ms',
-            'calc_fuel_gs', 'calc_fuel_lph', 'total_fuel_l', 'fuel_lph'];
+            'advance', 'calc_fuel_gs', 'calc_fuel_lph', 'total_fuel_l', 'fuel_lph'];
         DATA_KEYS.forEach(k => history[k] = []);
 
         // ========== Alert Threshold System ==========
@@ -3132,6 +3147,10 @@
 
         function createChart(canvasId, colorIdx) {
             const ctx = document.getElementById(canvasId).getContext('2d');
+            const isDarkInit = document.documentElement.getAttribute('data-theme') === 'dark';
+            const initGrid = isDarkInit ? '#30363d' : '#eee';
+            const initTick = isDarkInit ? '#8b949e' : '#999';
+            const initLegend = isDarkInit ? '#8b949e' : '#555';
             return new Chart(ctx, {
                 type: 'line',
                 data: { labels: [], datasets: [{ label: '', data: [], borderColor: chartColors[colorIdx], backgroundColor: chartBgColors[colorIdx], borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: true }] },
@@ -3139,10 +3158,10 @@
                     responsive: true, maintainAspectRatio: false,
                     animation: { duration: 0 },
                     scales: {
-                        x: { display: true, grid: { color: '#eee' }, ticks: { color: '#999', font: { size: 9 }, maxTicksLimit: 8 } },
-                        y: { display: true, grid: { color: '#eee' }, ticks: { color: '#999', font: { size: 9 } } }
+                        x: { display: true, grid: { color: initGrid }, ticks: { color: initTick, font: { size: 9 }, maxTicksLimit: 8 } },
+                        y: { display: true, grid: { color: initGrid }, ticks: { color: initTick, font: { size: 9 } } }
                     },
-                    plugins: { legend: { display: true, labels: { color: '#555', font: { size: 10 } } } }
+                    plugins: { legend: { display: true, labels: { color: initLegend, font: { size: 10 } } } }
                 }
             });
         }
@@ -3395,11 +3414,6 @@
             document.getElementById('goproModeManualBtn').classList.toggle('active', !autoMode);
             document.getElementById('goproModeAutoBtn').classList.toggle('active', autoMode);
             document.getElementById('goproAutoStatus').style.display = autoMode ? '' : 'none';
-            // 自動モード時は手動の録画ボタンは無効化（誤操作防止）
-            if (autoMode) {
-                document.getElementById('goproRecStartBtn').disabled = true;
-                document.getElementById('goproRecStopBtn').disabled = true;
-            }
 
             // --- ボタン有効/無効 ---
             document.getElementById('goproPowerOnBtn').disabled = connected;
@@ -3407,6 +3421,12 @@
             document.getElementById('goproRecStartBtn').disabled = !connected || recording;
             document.getElementById('goproRecStopBtn').disabled = !connected || !recording;
             document.getElementById('goproConnBtn').disabled = connected;
+
+            // 自動モード時は手動の録画ボタンは無効化（誤操作防止）— 通常ロジックの後で上書き
+            if (autoMode) {
+                document.getElementById('goproRecStartBtn').disabled = true;
+                document.getElementById('goproRecStopBtn').disabled = true;
+            }
         }
 
         // ========== Log ==========
@@ -3854,6 +3874,7 @@
             setVal('dFuelP', d.fuel_p, 0);
             setVal('dVolts', d.volts, 1);
             setVal('dInj', d.injection_ms, 2);
+            setVal('dAdvance', d.advance, 1);
             setVal('dTotalFuel', d.total_fuel_l, 3);
             updateResetFuelDisplay(d.total_fuel_l);
             setVal('dFuelGs', d.calc_fuel_gs, 2);
@@ -4194,173 +4215,174 @@
                     showSaveDialog(endTime);
                 }
             }
+        }
 
-            function showSaveDialog(endTime) {
-                const duration = endTime - recStartTime;
-                const min = Math.floor(duration / 60000);
-                const sec = Math.floor((duration % 60000) / 1000);
-                const dateStr = new Date(recStartTime).toLocaleString('ja-JP', { hour12: false });
+        function showSaveDialog(endTime) {
+            const duration = endTime - recStartTime;
+            const min = Math.floor(duration / 60000);
+            const sec = Math.floor((duration % 60000) / 1000);
+            const dateStr = new Date(recStartTime).toLocaleString('ja-JP', { hour12: false });
 
-                document.getElementById('saveStats').innerHTML =
-                    '📊 記録データ: <strong>' + recDataPoints.length + '</strong>ポイント' +
-                    ' ｜ 記録時間: <strong>' + min + '分' + sec + '秒</strong>' +
-                    ' ｜ 開始: ' + dateStr;
+            document.getElementById('saveStats').innerHTML =
+                '📊 記録データ: <strong>' + recDataPoints.length + '</strong>ポイント' +
+                ' ｜ 記録時間: <strong>' + min + '分' + sec + '秒</strong>' +
+                ' ｜ 開始: ' + dateStr;
 
-                // デフォルト名を設定
-                const now = new Date(recStartTime);
-                const defaultName = now.getFullYear() + '/' +
-                    String(now.getMonth() + 1).padStart(2, '0') + '/' +
-                    String(now.getDate()).padStart(2, '0') + ' ' +
-                    String(now.getHours()).padStart(2, '0') + ':' +
-                    String(now.getMinutes()).padStart(2, '0');
-                document.getElementById('sessionNameInput').value = defaultName;
-                document.getElementById('sessionMemoInput').value = '';
+            // デフォルト名を設定
+            const now = new Date(recStartTime);
+            const defaultName = now.getFullYear() + '/' +
+                String(now.getMonth() + 1).padStart(2, '0') + '/' +
+                String(now.getDate()).padStart(2, '0') + ' ' +
+                String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('sessionNameInput').value = defaultName;
+            document.getElementById('sessionMemoInput').value = '';
 
-                document.getElementById('saveSessionModal').classList.add('open');
-            }
+            document.getElementById('saveSessionModal').classList.add('open');
+        }
 
-            function closeSaveModal() {
-                document.getElementById('saveSessionModal').classList.remove('open');
-            }
+        function closeSaveModal() {
+            document.getElementById('saveSessionModal').classList.remove('open');
+        }
 
-            function confirmSaveSession() {
-                const name = document.getElementById('sessionNameInput').value.trim() || '無名セッション';
-                const memo = document.getElementById('sessionMemoInput').value.trim();
-                const endTime = recDataPoints.length > 0 ? recDataPoints[recDataPoints.length - 1].ts : Date.now();
-                const sessionId = 'session_' + recStartTime;
+        function confirmSaveSession() {
+            const name = document.getElementById('sessionNameInput').value.trim() || '無名セッション';
+            const memo = document.getElementById('sessionMemoInput').value.trim();
+            const endTime = recDataPoints.length > 0 ? recDataPoints[recDataPoints.length - 1].ts : Date.now();
+            const sessionId = 'session_' + recStartTime;
 
-                const meta = {
-                    id: sessionId, name, memo,
-                    startTime: recStartTime, endTime,
-                    duration: endTime - recStartTime,
-                    pointCount: recDataPoints.length,
-                    mode: recMode
-                };
+            const meta = {
+                id: sessionId, name, memo,
+                startTime: recStartTime, endTime,
+                duration: endTime - recStartTime,
+                pointCount: recDataPoints.length,
+                mode: recMode
+            };
 
-                // ★ Firebaseに保存（メタ + データ）
-                const sessRef = db.ref('sessions/' + sessionId);
-                sessRef.set({
-                    meta: meta,
-                    // データはJSON文字列にして1フィールドに格納（RTDBの負荷軽減）
-                    data: JSON.stringify(recDataPoints)
-                }).then(() => {
-                    addLog('[SAVE] セッション「' + name + '」をクラウド保存');
-                    recDataPoints = [];
-                    closeSaveModal();
-                }).catch(err => {
-                    alert('クラウド保存に失敗: ' + err.message);
-                    addLog('[ERR] クラウド保存失敗: ' + err.message);
-                });
-            }
-
-            // ★ 自動モード用: ダイアログなしで即保存
-            function autoSaveSession(endTime) {
-                const sessionId = 'session_' + recStartTime;
-                const now = new Date(recStartTime);
-                const autoName = '自動 ' + now.getFullYear() + '/' +
-                    String(now.getMonth() + 1).padStart(2, '0') + '/' +
-                    String(now.getDate()).padStart(2, '0') + ' ' +
-                    String(now.getHours()).padStart(2, '0') + ':' +
-                    String(now.getMinutes()).padStart(2, '0');
-
-                const meta = {
-                    id: sessionId, name: autoName, memo: '自動記録',
-                    startTime: recStartTime, endTime,
-                    duration: endTime - recStartTime,
-                    pointCount: recDataPoints.length,
-                    mode: 'auto'
-                };
-
-                const pointsToSave = recDataPoints.slice();   // コピーを保持
-                db.ref('sessions/' + sessionId).set({
-                    meta: meta,
-                    data: JSON.stringify(pointsToSave)
-                }).then(() => {
-                    addLog('[AUTO SAVE] セッション「' + autoName + '」を自動保存 (' + pointsToSave.length + 'pt)');
-                    recDataPoints = [];
-                }).catch(err => {
-                    addLog('[ERR] 自動保存失敗: ' + err.message);
-                });
-            }
-
-            function discardRecording() {
-                if (!confirm('記録データを破棄しますか？')) return;
+            // ★ Firebaseに保存（メタ + データ）
+            const sessRef = db.ref('sessions/' + sessionId);
+            sessRef.set({
+                meta: meta,
+                // データはJSON文字列にして1フィールドに格納（RTDBの負荷軽減）
+                data: JSON.stringify(recDataPoints)
+            }).then(() => {
+                addLog('[SAVE] セッション「' + name + '」をクラウド保存');
                 recDataPoints = [];
                 closeSaveModal();
-                addLog('[DEL] 記録データを破棄');
-            }
+            }).catch(err => {
+                alert('クラウド保存に失敗: ' + err.message);
+                addLog('[ERR] クラウド保存失敗: ' + err.message);
+            });
+        }
 
-            // ========== 自動モード: エンジン稼働検知 ==========
-            function handleAutoMode(d) {
-                if (recMode !== 'auto') return;
-                const rpm = parseFloat(d.rpm) || 0;
-                const engineRunning = rpm > 0;
+        // ★ 自動モード用: ダイアログなしで即保存
+        function autoSaveSession(endTime) {
+            const sessionId = 'session_' + recStartTime;
+            const now = new Date(recStartTime);
+            const autoName = '自動 ' + now.getFullYear() + '/' +
+                String(now.getMonth() + 1).padStart(2, '0') + '/' +
+                String(now.getDate()).padStart(2, '0') + ' ' +
+                String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0');
 
-                if (engineRunning && !isRecording) {
-                    // エンジン始動 → 記録開始
-                    if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
-                    startRecording();
-                    addLog('[AUTO] エンジン稼働を検知 → 記録開始');
-                } else if (!engineRunning && isRecording) {
-                    // エンジン停止 → 遅延付きで停止
-                    if (!autoStopTimer) {
-                        autoStopTimer = setTimeout(() => {
-                            if (isRecording && recMode === 'auto') {
-                                addLog('[AUTO] エンジン停止を検知 → 記録停止');
-                                stopRecording();
-                            }
-                            autoStopTimer = null;
-                        }, AUTO_STOP_DELAY);
-                    }
-                } else if (engineRunning && isRecording && autoStopTimer) {
-                    // 一時的にRPM=0だったが復帰 → 停止タイマーキャンセル
-                    clearTimeout(autoStopTimer);
-                    autoStopTimer = null;
+            const meta = {
+                id: sessionId, name: autoName, memo: '自動記録',
+                startTime: recStartTime, endTime,
+                duration: endTime - recStartTime,
+                pointCount: recDataPoints.length,
+                mode: 'auto'
+            };
+
+            const pointsToSave = recDataPoints.slice();   // コピーを保持
+            db.ref('sessions/' + sessionId).set({
+                meta: meta,
+                data: JSON.stringify(pointsToSave)
+            }).then(() => {
+                addLog('[AUTO SAVE] セッション「' + autoName + '」を自動保存 (' + pointsToSave.length + 'pt)');
+                recDataPoints = [];
+            }).catch(err => {
+                addLog('[ERR] 自動保存失敗: ' + err.message);
+            });
+        }
+
+        function discardRecording() {
+            if (!confirm('記録データを破棄しますか？')) return;
+            recDataPoints = [];
+            closeSaveModal();
+            addLog('[DEL] 記録データを破棄');
+        }
+
+        // ========== 自動モード: エンジン稼働検知 ==========
+        function handleAutoMode(d) {
+            if (recMode !== 'auto') return;
+            const rpm = parseFloat(d.rpm) || 0;
+            const engineRunning = rpm > 0;
+
+            if (engineRunning && !isRecording) {
+                // エンジン始動 → 記録開始
+                if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
+                startRecording();
+                addLog('[AUTO] エンジン稼働を検知 → 記録開始');
+            } else if (!engineRunning && isRecording) {
+                // エンジン停止 → 遅延付きで停止
+                if (!autoStopTimer) {
+                    autoStopTimer = setTimeout(() => {
+                        if (isRecording && recMode === 'auto') {
+                            addLog('[AUTO] エンジン停止を検知 → 記録停止');
+                            stopRecording();
+                        }
+                        autoStopTimer = null;
+                    }, AUTO_STOP_DELAY);
                 }
+            } else if (engineRunning && isRecording && autoStopTimer) {
+                // 一時的にRPM=0だったが復帰 → 停止タイマーキャンセル
+                clearTimeout(autoStopTimer);
+                autoStopTimer = null;
             }
+        }
 
-            // ========== セッションメタデータ管理 ==========
-            function getSessionsMeta() {
-                try {
-                    const raw = localStorage.getItem(SESSION_META_KEY);
-                    return raw ? JSON.parse(raw) : [];
-                } catch { return []; }
-            }
+        // ========== セッションメタデータ管理 ==========
+        function getSessionsMeta() {
+            try {
+                const raw = localStorage.getItem(SESSION_META_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch { return []; }
+        }
 
-            // ========== 走行履歴モーダル ==========
-            function openHistoryModal() {
-                document.getElementById('historyModal').classList.add('open');
-                renderSessionList();
-            }
+        // ========== 走行履歴モーダル ==========
+        function openHistoryModal() {
+            document.getElementById('historyModal').classList.add('open');
+            renderSessionList();
+        }
 
-            function closeHistoryModal() {
-                document.getElementById('historyModal').classList.remove('open');
-            }
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('open');
+        }
 
-            function renderSessionList() {
-                const container = document.getElementById('sessionListContainer');
-                container.innerHTML = '<div class="session-empty">読み込み中...</div>';
+        function renderSessionList() {
+            const container = document.getElementById('sessionListContainer');
+            container.innerHTML = '<div class="session-empty">読み込み中...</div>';
 
-                db.ref('sessions').once('value').then(snap => {
-                    const all = snap.val();
-                    if (!all) {
-                        container.innerHTML = '<div class="session-empty">記録された走行セッションはありません</div>';
-                        return;
-                    }
-                    const metas = Object.values(all).map(s => s.meta).filter(Boolean)
-                        .sort((a, b) => b.startTime - a.startTime);
+            db.ref('sessions').once('value').then(snap => {
+                const all = snap.val();
+                if (!all) {
+                    container.innerHTML = '<div class="session-empty">記録された走行セッションはありません</div>';
+                    return;
+                }
+                const metas = Object.values(all).map(s => s.meta).filter(Boolean)
+                    .sort((a, b) => b.startTime - a.startTime);
 
-                    if (metas.length === 0) {
-                        container.innerHTML = '<div class="session-empty">記録された走行セッションはありません</div>';
-                        return;
-                    }
+                if (metas.length === 0) {
+                    container.innerHTML = '<div class="session-empty">記録された走行セッションはありません</div>';
+                    return;
+                }
 
-                    let html = '<ul class="session-list">';
-                    metas.forEach(s => {
-                        const date = new Date(s.startTime).toLocaleString('ja-JP', { hour12: false });
-                        const dur = Math.floor(s.duration / 60000) + '分' + Math.floor((s.duration % 60000) / 1000) + '秒';
-                        const modeLabel = s.mode === 'auto' ? '自動' : '手動';
-                        html += `
+                let html = '<ul class="session-list">';
+                metas.forEach(s => {
+                    const date = new Date(s.startTime).toLocaleString('ja-JP', { hour12: false });
+                    const dur = Math.floor(s.duration / 60000) + '分' + Math.floor((s.duration % 60000) / 1000) + '秒';
+                    const modeLabel = s.mode === 'auto' ? '自動' : '手動';
+                    html += `
             <li class="session-item">
               <div class="session-info">
                 <div class="session-name">${escapeHtml(s.name)}</div>
@@ -4371,135 +4393,137 @@
                 <button class="session-action-btn delete" onclick="deleteSession('${s.id}')" title="削除">削除</button>
               </div>
             </li>`;
-                    });
-                    html += '</ul>';
-                    container.innerHTML = html;
-                }).catch(err => {
-                    container.innerHTML = '<div class="session-empty">読み込み失敗: ' + err.message + '</div>';
-                    addLog('[ERR] 履歴読み込み失敗: ' + err.message);
                 });
-            }
-
-
-
-            function escapeHtml(str) {
-                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            }
-
-            function deleteSession(id) {
-                if (!confirm('このセッションを削除しますか？')) return;
-                db.ref('sessions/' + id).remove().then(() => {
-                    renderSessionList();
-                    addLog('[DEL] セッションを削除');
-                }).catch(err => {
-                    addLog('[ERR] 削除失敗: ' + err.message);
-                });
-            }
-
-
-
-            function clearAllSessions() {
-                if (!confirm('全ての走行履歴を削除しますか？\nこの操作は取り消せません。')) return;
-                db.ref('sessions').remove().then(() => {
-                    renderSessionList();
-                    addLog('[DEL] 全走行履歴を削除');
-                }).catch(err => {
-                    addLog('[ERR] 全削除失敗: ' + err.message);
-                });
-            }
-
-            // ========== セッション閲覧（別ページに遷移） ==========
-            function viewSession(id) {
-                closeHistoryModal();
-                window.open('session_viewer.html?id=' + encodeURIComponent(id), '_blank');
-            }
-
-            // ========== ダウンロード機能 ==========
-            function getSessionData(id) {
-                try {
-                    const raw = localStorage.getItem(SESSION_DATA_PREFIX + id);
-                    return raw ? JSON.parse(raw) : null;
-                } catch { return null; }
-            }
-
-            function getSessionMeta(id) {
-                const meta = getSessionsMeta();
-                return meta.find(s => s.id === id) || null;
-            }
-
-            function downloadSessionCSV(id) {
-                const data = getSessionData(id);
-                const meta = getSessionMeta(id);
-                if (!data || data.length === 0) { alert('データがありません'); return; }
-
-                const headers = ['Timestamp', 'Time', 'RPM', 'TPS(%)', 'Speed(km/h)', 'Gear',
-                    'WaterTemp(°C)', 'AirTemp(°C)', 'MAP(kPa)', 'Lambda', 'OilP(kPa)', 'OilTemp(°C)',
-                    'FuelP(kPa)', 'Volts(V)', 'Injection(ms)', 'FuelGs(g/s)', 'FuelLph(L/h)',
-                    'TotalFuel(L)', 'CRK_Errors', 'CAM_Errors'];
-
-                const dataKeys = ['rpm', 'tps', 'kph', 'gear', 'water_temp', 'air_temp', 'map_kpa', 'lambda',
-                    'oil_p', 'oil_temp', 'fuel_p', 'volts', 'injection_ms', 'calc_fuel_gs', 'calc_fuel_lph',
-                    'total_fuel_l', 'crank_errors', 'cam_errors'];
-
-                const rows = data.map(p => {
-                    const time = new Date(p.ts).toLocaleTimeString('ja-JP', { hour12: false }) + '.' +
-                        String(new Date(p.ts).getMilliseconds()).padStart(3, '0');
-                    return [p.ts, time, ...dataKeys.map(k => p[k] !== undefined ? p[k] : '')];
-                });
-
-                const csv = '\uFEFF' + [
-                    headers.map(h => '"' + h + '"').join(','),
-                    ...rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
-                ].join('\n');
-
-                const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.csv';
-                downloadBlob(csv, filename, 'text/csv;charset=utf-8;');
-                addLog('[DL] CSV: ' + filename);
-            }
-
-            function downloadSessionJSON(id) {
-                const data = getSessionData(id);
-                const meta = getSessionMeta(id);
-                if (!data || data.length === 0) { alert('データがありません'); return; }
-
-                const exportObj = {
-                    exportDate: new Date().toISOString(),
-                    session: meta,
-                    dataPoints: data
-                };
-
-                const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.json';
-                downloadBlob(JSON.stringify(exportObj, null, 2), filename, 'application/json');
-                addLog('[DL] JSON: ' + filename);
-            }
-
-            function downloadBlob(content, filename, mimeType) {
-                const blob = new Blob([content], { type: mimeType });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-
-            // ========== バージョンモーダル ==========
-            function openVersionModal() {
-                document.getElementById('versionModal').classList.add('open');
-            }
-
-            function closeVersionModal() {
-                document.getElementById('versionModal').classList.remove('open');
-            }
-
-            // ========== 新モーダルの背景クリック閉じ ==========
-            ['historyModal', 'saveSessionModal', 'versionModal'].forEach(id => {
-                document.getElementById(id).addEventListener('click', function (e) {
-                    if (e.target === this) this.classList.remove('open');
-                });
+                html += '</ul>';
+                container.innerHTML = html;
+            }).catch(err => {
+                container.innerHTML = '<div class="session-empty">読み込み失敗: ' + err.message + '</div>';
+                addLog('[ERR] 履歴読み込み失敗: ' + err.message);
             });
+        }
+
+
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function deleteSession(id) {
+            if (!confirm('このセッションを削除しますか？')) return;
+            db.ref('sessions/' + id).remove().then(() => {
+                renderSessionList();
+                addLog('[DEL] セッションを削除');
+            }).catch(err => {
+                addLog('[ERR] 削除失敗: ' + err.message);
+            });
+        }
+
+
+
+        function clearAllSessions() {
+            if (!confirm('全ての走行履歴を削除しますか？\nこの操作は取り消せません。')) return;
+            db.ref('sessions').remove().then(() => {
+                renderSessionList();
+                addLog('[DEL] 全走行履歴を削除');
+            }).catch(err => {
+                addLog('[ERR] 全削除失敗: ' + err.message);
+            });
+        }
+
+        // ========== セッション閲覧（別ページに遷移） ==========
+        function viewSession(id) {
+            closeHistoryModal();
+            window.open('session_viewer.html?id=' + encodeURIComponent(id), '_blank');
+        }
+
+        // ========== ダウンロード機能 ==========
+        // Firebase版: セッションデータを非同期で取得
+        async function getSessionDataAsync(id) {
+            try {
+                const snap = await db.ref('sessions/' + id).once('value');
+                const s = snap.val();
+                if (!s) return { meta: null, data: null };
+                return {
+                    meta: s.meta || null,
+                    data: s.data ? JSON.parse(s.data) : null
+                };
+            } catch (e) {
+                addLog('[ERR] セッション取得失敗: ' + e.message);
+                return { meta: null, data: null };
+            }
+        }
+
+        async function downloadSessionCSV(id) {
+            const { meta, data } = await getSessionDataAsync(id);
+            if (!data || data.length === 0) { alert('データがありません'); return; }
+
+            const headers = ['Timestamp', 'Time', 'RPM', 'TPS(%)', 'Speed(km/h)', 'Gear',
+                'WaterTemp(°C)', 'AirTemp(°C)', 'MAP(kPa)', 'Lambda', 'OilP(kPa)', 'OilTemp(°C)',
+                'FuelP(kPa)', 'Volts(V)', 'Injection(ms)', 'FuelGs(g/s)', 'FuelLph(L/h)',
+                'TotalFuel(L)', 'CRK_Errors', 'CAM_Errors'];
+
+            const dataKeys = ['rpm', 'tps', 'kph', 'gear', 'water_temp', 'air_temp', 'map_kpa', 'lambda',
+                'oil_p', 'oil_temp', 'fuel_p', 'volts', 'injection_ms', 'calc_fuel_gs', 'calc_fuel_lph',
+                'total_fuel_l', 'crank_errors', 'cam_errors'];
+
+            const rows = data.map(p => {
+                const time = new Date(p.ts).toLocaleTimeString('ja-JP', { hour12: false }) + '.' +
+                    String(new Date(p.ts).getMilliseconds()).padStart(3, '0');
+                return [p.ts, time, ...dataKeys.map(k => p[k] !== undefined ? p[k] : '')];
+            });
+
+            const csv = '\uFEFF' + [
+                headers.map(h => '"' + h + '"').join(','),
+                ...rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
+            ].join('\n');
+
+            const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.csv';
+            downloadBlob(csv, filename, 'text/csv;charset=utf-8;');
+            addLog('[DL] CSV: ' + filename);
+        }
+
+        async function downloadSessionJSON(id) {
+            const { meta, data } = await getSessionDataAsync(id);
+            if (!data || data.length === 0) { alert('データがありません'); return; }
+
+            const exportObj = {
+                exportDate: new Date().toISOString(),
+                session: meta,
+                dataPoints: data
+            };
+
+            const filename = 'telemetry_' + (meta ? meta.name.replace(/[/\\:*?"<>|]/g, '_') : id) + '.json';
+            downloadBlob(JSON.stringify(exportObj, null, 2), filename, 'application/json');
+            addLog('[DL] JSON: ' + filename);
+        }
+
+        function downloadBlob(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ========== バージョンモーダル ==========
+        function openVersionModal() {
+            document.getElementById('versionModal').classList.add('open');
+        }
+
+        function closeVersionModal() {
+            document.getElementById('versionModal').classList.remove('open');
+        }
+
+        // ========== 新モーダルの背景クリック閉じ ==========
+        ['historyModal', 'saveSessionModal', 'versionModal'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function (e) {
+                if (e.target === this) this.classList.remove('open');
+            });
+        });
     </script>
 </body>
 
