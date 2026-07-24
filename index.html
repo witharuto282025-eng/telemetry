@@ -18,17 +18,32 @@
         }
 
         :root {
-            --bg: #f5f5f5;
+            /* Apple neutral gray palette (systemGray tones) */
+            --bg: #f5f5f7;
             --panel: #ffffff;
-            --border: #e0e0e0;
-            --accent: #2e7d32;
-            --accent2: #00838f;
+            --border: #d2d2d7;
+            --accent: #30913a;
+            --accent2: #1d1d1f;   /* 数値は落ち着いた黒鉛グレーで情報を主役に */
             --warn: #d32f2f;
-            --text: #212121;
-            --dim: #888;
-            --card-bg: #f0f0f0;
+            --text: #1d1d1f;
+            --dim: #86868b;
+            --card-bg: #f5f5f7;
             --header-bg: #ffffff;
             --shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            /* ===== Apple-style design tokens ===== */
+            /* Critically-damped spring feel (§4): snappy, no distracting overshoot */
+            --spring: cubic-bezier(0.32, 0.72, 0, 1);
+            /* Slight momentum overshoot — only for physical/press interactions */
+            --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --resp-fast: 140ms;
+            --resp: 240ms;
+            /* Layered, context-aware shadows (§12) */
+            --elev-1: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.06);
+            --elev-2: 0 2px 6px rgba(0, 0, 0, 0.07), 0 6px 18px rgba(0, 0, 0, 0.08);
+            --elev-3: 0 8px 24px rgba(0, 0, 0, 0.12), 0 24px 60px rgba(0, 0, 0, 0.18);
+            /* Translucent chrome materials (§12) */
+            --material: rgba(255, 255, 255, 0.72);
+            --material-strong: rgba(255, 255, 255, 0.85);
         }
 
         /* ===== DARK MODE ===== */
@@ -37,13 +52,19 @@
             --panel: #161b22;
             --border: #30363d;
             --accent: #4caf50;
-            --accent2: #26c6da;
+            --accent2: #f5f5f7;   /* 数値はニュートラルな白鉛グレーで主役に */
             --warn: #ef5350;
-            --text: #e6edf3;
-            --dim: #8b949e;
-            --card-bg: #21262d;
+            --text: #f5f5f7;
+            --dim: #98989d;
+            --card-bg: #1c1c1e;
             --header-bg: #0d1117;
             --shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+            /* Dark: deeper, softer elevation + darker translucent material */
+            --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.5);
+            --elev-2: 0 2px 8px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.55);
+            --elev-3: 0 10px 30px rgba(0, 0, 0, 0.6), 0 30px 70px rgba(0, 0, 0, 0.7);
+            --material: rgba(22, 27, 34, 0.72);
+            --material-strong: rgba(13, 17, 23, 0.85);
         }
 
         [data-theme="dark"] .modal {
@@ -331,21 +352,29 @@
         }
 
         /* ===== HEADER ===== */
+        /* Translucent floating chrome — content scrolls under it (§12) */
         header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 8px 20px;
-            background: var(--header-bg);
+            background: var(--material);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
-            box-shadow: var(--shadow);
+            box-shadow: var(--elev-1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
         header h1 {
             font-size: 18px;
             font-weight: 700;
-            letter-spacing: 2px;
+            /* Large display text: negative tracking, tighter leading (§15) */
+            letter-spacing: -0.01em;
+            line-height: 1.1;
             color: var(--text);
         }
 
@@ -923,7 +952,10 @@
 
         /* ===== ALERT SETTINGS MODAL ===== */
         .modal-overlay {
-            display: none;
+            /* visibility+opacity方式: display:noneをやめてマテリアライズ演出を可能に(§12) */
+            display: flex;
+            visibility: hidden;
+            pointer-events: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -933,6 +965,10 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+        }
+        .modal-overlay.open {
+            visibility: visible;
+            pointer-events: auto;
         }
 
         .modal-overlay.open {
@@ -2296,6 +2332,212 @@
                 gap: 6px;
             }
         }
+
+        /* ============================================================
+           ▼ APPLE DESIGN LAYER (デザイン規則適用)
+           §1 応答  §4 スプリング  §7 空間的整合  §12 マテリアル
+           §14 アクセシビリティ  §15 タイポグラフィ
+           ============================================================ */
+
+        /* --- §1 応答: すべての操作要素は押下(pointer-down)で即フィードバック --- */
+        button,
+        .header-btn,
+        #alertSettingsBtn,
+        .history-btn,
+        .rec-btn,
+        .rec-mode-btn,
+        .gopro-btn,
+        .session-action-btn,
+        .reset-fuel-btn,
+        .modal-footer button,
+        .modal-close {
+            transition: transform var(--resp-fast) var(--spring),
+                        background var(--resp) var(--spring),
+                        border-color var(--resp) var(--spring),
+                        box-shadow var(--resp) var(--spring),
+                        color var(--resp) var(--spring);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        /* 押した瞬間に沈む — 離す(click)を待たない */
+        button:active,
+        .header-btn:active,
+        #alertSettingsBtn:active,
+        .history-btn:active,
+        .gopro-btn:not(:disabled):active,
+        .session-action-btn:active,
+        .reset-fuel-btn:active,
+        .rec-btn:active,
+        .modal-footer button:active {
+            transform: scale(0.96);
+        }
+        .rec-mode-btn:active { transform: scale(0.94); }
+        .modal-close:active { transform: scale(0.9); }
+        /* ホバーで軽く浮く（クラフト感・深度のヒント §12） */
+        .header-btn:hover,
+        #alertSettingsBtn:hover,
+        .history-btn:hover {
+            box-shadow: var(--elev-1);
+        }
+        .gopro-btn:not(:disabled):hover,
+        .session-action-btn:hover {
+            box-shadow: var(--elev-1);
+        }
+        /* 主ボタン(保存)は押下フィードバック＋わずかな浮き */
+        .btn-save:hover { box-shadow: var(--elev-2); }
+
+        /* --- §15 タイポグラフィ: 大きな数字は負トラッキング＆タイトなleading --- */
+        .gauge-value-text,
+        .speed-display .speed-num,
+        .reset-fuel-value {
+            letter-spacing: -0.03em;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+        }
+        /* データカードの数値: 大きく・軽く・等幅数字のsans。情報を主役に(§15) */
+        .data-card .value {
+            font-family: -apple-system, "SF Pro Display", "Helvetica Neue",
+                         "Segoe UI", "Noto Sans JP", sans-serif;
+            font-size: 19px;
+            font-weight: 500;          /* 700→500 軽く */
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+            margin-top: 1px;
+        }
+        /* ラベルは思い切り小さく淡く → 数値との階層を明確化(§15) */
+        .data-card .label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            opacity: 0.75;
+        }
+        .data-card .unit {
+            font-size: 9px;
+            opacity: 0.7;
+        }
+        /* エラーカードの巨大数字も軽量sansに揃える */
+        .data-card.error-card .value {
+            font-family: -apple-system, "SF Pro Display", "Helvetica Neue",
+                         "Segoe UI", sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .gopro-status-label,
+        .reset-fuel-label {
+            letter-spacing: 0.02em;
+        }
+        /* カードの角丸を少し大きくして柔らかく(§クラフト) */
+        .data-card {
+            border-radius: 10px;
+            padding: 6px 6px;
+        }
+
+        /* --- §12 深度: カードの影を階層化（軽いelevation） --- */
+        .data-card {
+            box-shadow: var(--elev-1);
+        }
+
+        /* --- §12 マテリアル: モーダルのscrim(背景暗転)をぼかし付きに --- */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px) saturate(120%);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            /* scrim自体もふわっと（§12 materialize） */
+            opacity: 0;
+            transition: opacity var(--resp) var(--spring);
+        }
+        .modal-overlay.open {
+            opacity: 1;
+        }
+        /* --- §12/§7 モーダル本体: マテリアライズ（scale+ぼかし）で"到着"を表現 --- */
+        .modal {
+            box-shadow: var(--elev-3);
+            transform: scale(0.92);
+            opacity: 0;
+            transform-origin: center center;
+            transition: transform var(--resp) var(--spring-bounce),
+                        opacity var(--resp) var(--spring);
+            will-change: transform, opacity;
+        }
+        .modal-overlay.open .modal {
+            transform: scale(1);
+            opacity: 1;
+        }
+        /* モーダルヘッダー/フッターも半透明マテリアルに */
+        .modal-header,
+        .modal-footer {
+            background: var(--material-strong);
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+        }
+
+        /* --- §4 主要トランジションをスプリング曲線に統一 --- */
+        #connStatus,
+        .conn-chip,
+        .data-card,
+        .gopro-status-item,
+        .ind,
+        .gopro-status-dot {
+            transition-timing-function: var(--spring);
+        }
+
+        /* --- §14 アクセシビリティ: モーション低減 --- */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 120ms !important;
+                scroll-behavior: auto !important;
+            }
+            /* スプリングのオーバーシュートは無効化しクロスフェード相当に */
+            .modal {
+                transition: opacity 160ms ease !important;
+                transform: none !important;
+            }
+            .modal-overlay.open .modal {
+                transform: none !important;
+            }
+            button:active,
+            .rec-mode-btn:active,
+            .modal-close:active {
+                transform: none !important;
+            }
+        }
+
+        /* --- §14 透明度低減: すりガラスをソリッド寄りに --- */
+        @media (prefers-reduced-transparency: reduce) {
+            header,
+            .modal-header,
+            .modal-footer {
+                background: var(--header-bg);
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+            .modal-overlay {
+                background: rgba(0, 0, 0, 0.55);
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+        }
+
+        /* --- §14 コントラスト強調: 境界を明確に --- */
+        @media (prefers-contrast: more) {
+            .data-card,
+            .conn-chip,
+            .gopro-status-item,
+            .modal {
+                border-width: 2px;
+            }
+            .data-card .label,
+            .gopro-status-label {
+                color: var(--text);
+            }
+        }
     </style>
 
 <body>
@@ -2579,9 +2821,14 @@
                     <div class="value" id="dAdvance">—</div>
                     <div class="unit">°</div>
                 </div>
-                <div class="data-card full" id="card_totalfuel">
+                <div class="data-card full" id="card_totalfuel" ondblclick="clearTotalFuelAccum()" title="ダブルクリックで積算をゼロにリセット">
                     <div class="label">総燃料消費</div>
                     <div class="value" id="dTotalFuel">—</div>
+                    <div class="unit">L</div>
+                </div>
+                <div class="data-card full" id="card_totalfuel_v2">
+                    <div class="label">総燃料消費V2</div>
+                    <div class="value" id="dTotalFuelV2">—</div>
                     <div class="unit">L</div>
                 </div>
                 <div class="data-card" id="card_fuelgs">
@@ -2960,7 +3207,7 @@
         const history = {};
         const DATA_KEYS = ['rpm', 'tps', 'kph', 'gear', 'water_temp', 'air_temp', 'map_kpa', 'lambda',
             'oil_p', 'oil_temp', 'fuel_p', 'volts', 'crank_errors', 'cam_errors', 'injection_ms',
-            'advance', 'calc_fuel_gs', 'calc_fuel_lph', 'total_fuel_l', 'fuel_lph'];
+            'advance', 'calc_fuel_gs', 'calc_fuel_lph', 'total_fuel_l', 'total_fuel_l_v2', 'fuel_lph'];
         DATA_KEYS.forEach(k => history[k] = []);
 
         // ========== Alert Threshold System ==========
@@ -2981,6 +3228,7 @@
             { key: 'injection_ms', label: '噴射時間', unit: 'ms', cardId: 'card_inj', dataKey: 'injection_ms', defaultWarnHi: null, defaultDangerHi: null, defaultWarnLo: null, defaultDangerLo: null },
             { key: 'calc_fuel_gs', label: '燃料 g/s', unit: 'g/s', cardId: 'card_fuelgs', dataKey: 'calc_fuel_gs', defaultWarnHi: null, defaultDangerHi: null, defaultWarnLo: null, defaultDangerLo: null },
             { key: 'calc_fuel_lph', label: '燃料 L/h', unit: 'L/h', cardId: 'card_fuellph', dataKey: 'calc_fuel_lph', defaultWarnHi: null, defaultDangerHi: null, defaultWarnLo: null, defaultDangerLo: null },
+            { key: 'total_fuel_l_v2', label: '総燃料消費V2', unit: 'L', cardId: 'card_total_fuel_v2', dataKey: 'total_fuel_l_v2', defaultWarnHi: null, defaultDangerHi: null, defaultWarnLo: null, defaultDangerLo: null },
         ];
 
         // 現在のアラート設定（localStorageから読み込み or デフォルト）
@@ -3133,6 +3381,8 @@
                 fuelResetBaseline = parseFloat(v.baseline);
                 fuelResetTime = parseInt(v.time);
                 if (latestData) updateResetFuelDisplay(latestData.total_fuel_l);
+                updateResetFuelDisplay(totalFuelAccum);
+                setVal('dTotalFuelV2', d.total_fuel_l_v2, 3);   // ★追加：改善方式を表示
             }
         });
 
@@ -3875,8 +4125,8 @@
             setVal('dVolts', d.volts, 1);
             setVal('dInj', d.injection_ms, 2);
             setVal('dAdvance', d.advance, 1);
-            setVal('dTotalFuel', d.total_fuel_l, 3);
-            updateResetFuelDisplay(d.total_fuel_l);
+            updateTotalFuel(d.total_fuel_l);              // 単調増加で0リセットを防止
+            updateResetFuelDisplay(totalFuelAccum);       // リセット後カードも堅牢な積算値を使用
             setVal('dFuelGs', d.calc_fuel_gs, 2);
             setVal('dFuelLph', d.calc_fuel_lph, 2);
             setVal('dCrkErr', d.crank_errors, 0);
@@ -4032,6 +4282,52 @@
         if (isNaN(fuelResetBaseline)) fuelResetBaseline = null;
         if (isNaN(fuelResetTime)) fuelResetTime = null;
 
+        // ========== 総燃料 単調増加アキュムレータ ==========
+        // ESP32再起動や瞬断で total_fuel_l が0に戻っても、表示は減らさず加算し続ける
+        const TOTAL_FUEL_ACCUM_KEY = 'ofrac-total-fuel-accum';
+        const TOTAL_FUEL_LASTRAW_KEY = 'ofrac-total-fuel-lastraw';
+        let totalFuelAccum = parseFloat(localStorage.getItem(TOTAL_FUEL_ACCUM_KEY));
+        let lastRawTotalFuel = parseFloat(localStorage.getItem(TOTAL_FUEL_LASTRAW_KEY));
+        if (isNaN(totalFuelAccum)) totalFuelAccum = 0;
+        if (isNaN(lastRawTotalFuel)) lastRawTotalFuel = null;
+
+        function updateTotalFuel(rawVal) {
+            const raw = parseFloat(rawVal);
+            const el = document.getElementById('dTotalFuel');
+            // データ欠損（undefined/NaN）は無視 → 直前の表示を保持
+            if (isNaN(raw)) return;
+
+            if (lastRawTotalFuel === null) {
+                // 初回：現在のESP値から開始（表示をESPと一致させる）
+                lastRawTotalFuel = raw;
+                if (totalFuelAccum === 0) totalFuelAccum = raw;
+            } else if (raw >= lastRawTotalFuel) {
+                // 通常：増えた分だけ加算
+                totalFuelAccum += (raw - lastRawTotalFuel);
+                lastRawTotalFuel = raw;
+            } else {
+                // rawが減った = ESP32再起動/リセット → 新しいraw分を加算（0には戻さない）
+                totalFuelAccum += raw;
+                lastRawTotalFuel = raw;
+            }
+            localStorage.setItem(TOTAL_FUEL_ACCUM_KEY, String(totalFuelAccum));
+            localStorage.setItem(TOTAL_FUEL_LASTRAW_KEY, String(lastRawTotalFuel));
+            if (el) el.textContent = totalFuelAccum.toFixed(3);
+        }
+
+        // 総燃料アキュムレータを手動でゼロクリア（新しい走行日など）
+        function clearTotalFuelAccum() {
+            if (!confirm('総燃料消費の積算をゼロにしますか？')) return;
+            totalFuelAccum = 0;
+            lastRawTotalFuel = latestData ? parseFloat(latestData.total_fuel_l) : null;
+            if (isNaN(lastRawTotalFuel)) lastRawTotalFuel = null;
+            localStorage.setItem(TOTAL_FUEL_ACCUM_KEY, '0');
+            if (lastRawTotalFuel !== null) localStorage.setItem(TOTAL_FUEL_LASTRAW_KEY, String(lastRawTotalFuel));
+            const el = document.getElementById('dTotalFuel');
+            if (el) el.textContent = '0.000';
+            addLog('[FUEL] 総燃料の積算をクリア');
+        }
+
         function updateResetFuelDisplay(currentTotal) {
             const valEl = document.getElementById('resetFuelValue');
             const metaEl = document.getElementById('resetFuelMeta');
@@ -4066,7 +4362,8 @@
         const fuelResetRef = db.ref('settings/fuel_reset');   // ★ 追加（他のref定義の近くでも可）
 
         function resetFuelCounter() {
-            const cur = latestData ? parseFloat(latestData.total_fuel_l) : 0;
+            // 積算値(totalFuelAccum)を基準にする → ESP再起動があってもズレない
+            const cur = totalFuelAccum;
             const baseline = isNaN(cur) ? 0 : cur;
             // ★ Firebaseに保存（全端末共有）
             fuelResetRef.set({ baseline: baseline, time: Date.now() })
